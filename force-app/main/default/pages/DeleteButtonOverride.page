@@ -1,0 +1,26 @@
+<apex:page standardController="Quote_Address__c" lightningStylesheets="true">
+    <apex:includeScript value="/soap/ajax/29.0/connection.js"/>
+    <apex:includeScript value="/support/console/43.0/integration.js"/>
+    <script>
+        function showToast() {
+            if (typeof sforce !== "undefined" && sforce.one) {
+                console.log('Inside sforce');
+                sforce.one.showToast({
+                    title: "Error!",
+                    message: "You cannot delete quote addresses.",
+                    duration: "5000",
+                    key: "info_alt",
+                    type: "error",
+                    mode: "pester"
+                });
+            } else {
+                console.log('Not inside sforce');
+                alert("You cannot delete quote addresses.");
+            }
+            window.history.back();
+            
+        }
+
+        window.onload = showToast;
+    </script>
+</apex:page>

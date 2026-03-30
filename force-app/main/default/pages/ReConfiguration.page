@@ -1,0 +1,46 @@
+<!--SC-0000100-->
+<!--Visualforce page to recost products by bundle -->
+<apex:page showHeader="false" controller="CTL_CB_ReConfiguration_UTL" action="{!priceGroup}" lightningStylesheets="true">
+     <apex:includeScript value="/soap/ajax/29.0/connection.js"/>
+    <apex:includeScript value="/support/console/43.0/integration.js"/>
+   <script>
+        function showToast() {
+            console.log('{!$CurrentPage.parameters.costing}');
+            let name = '{!$CurrentPage.parameters.name}';
+            let message = 'Re-costing for Group ';
+            message += name;
+            message += ' is already in progress. Please do not click on the button again.';
+            if (typeof sforce !== "undefined" && sforce.one && ('{!$CurrentPage.parameters.costing}' == 'true')) {
+                sforce.one.showToast({
+                    "title": "Error!",
+                    "message": message,
+                    "duration": "5000",
+                    "key": "info_alt",
+                    "type": "error",
+                    "mode": "pester"
+                });
+                
+            } else if ('{!$CurrentPage.parameters.costing}' == 'true') {
+                alert(message);
+              
+            }
+            else if (typeof sforce !== "undefined" && sforce.one && ('{!$CurrentPage.parameters.costing}' == 'false')) {
+                sforce.one.showToast({
+                    "title": "Success!",
+                    "message": "Re-costing successfully initiated. You will receive a notification when it is completed.",
+                    "duration": "5000",
+                    "key": "info_alt",
+                    "type": "success",
+                    "mode": "pester"
+                });
+                
+            } else if ('{!$CurrentPage.parameters.costing}' == 'false') {
+                alert("Re-costing successfully initiated. You will receive a notification when it is completed.");
+              
+            }
+           window.history.back();
+        }
+    window.onload = showToast;
+    
+    </script>
+</apex:page>

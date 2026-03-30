@@ -1,0 +1,51 @@
+<aura:component controller="OFSController" implements="force:appHostable,force:hasRecordId,flexipage:availableForAllPageTypes" access="global">
+<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>    
+<aura:attribute name="recordId" type="String" />
+<aura:attribute name="accounts" type="Account[]" />
+<aura:attribute name="showSuccess" type="Boolean" default="False" />
+<aura:attribute name="ofsLink" type="String" default="" />
+<aura:attribute name="linkLabel" type="String" default="" />
+<aura:attribute name="showError" type="Boolean" default="False" />
+<div class="slds-card slds-card_boundary">
+	<article class="slds-card">
+    	<div class="slds-card__header slds-grid">
+        	<header class="slds-media slds-media_center slds-has-flexi-truncate">
+            	<div class="slds-media__body">
+                	<h2 class="slds-card__header-title">
+                    	<a href="javascript:void(0);" class="slds-card__header-link slds-truncate" title="Accounts">
+                        	<span>Create OFS</span>
+                        </a>
+                    </h2>
+                    <aura:if isTrue="{!v.showSuccess}">
+                    	<ui:message title="OFS Created!" severity="confirm" closable="true">
+                            Click here to see it: 
+                            <lightning:formattedUrl value="{!v.ofsLink}" tooltip="{!v.ofsLink}" label="{!v.linkLabel}" target="_blank" />                                                    
+                        </ui:message>
+                    </aura:if>
+                    <aura:if isTrue="{!v.showError}">
+                    	<ui:message title="Uh Oh..." severity="error" closable="true">An error occurred. Contact the Software Dev team.</ui:message>
+                    </aura:if>
+                </div>
+            </header>
+        </div>
+        <div class="slds-card__body slds-card__body_inner">
+            <lightning:select aura:id="Account" name="Account" label="Account:" required="true">
+                <option value=""></option>
+                <aura:iteration items="{!v.accounts}" var="a">
+                	<option text="" value="{!a.CRM_ID__c}">{!a.Name} ({!a.Customer_Number__c})</option>
+            	</aura:iteration>
+                <option value="new">New Account</option>
+            </lightning:select><br/>
+            <lightning:select aura:id="OrderType" name="OrderType" label="Order Type:" required="true">
+                <option value="new">New</option>
+                <option value="renew">Renew</option>
+                <option value="change">Change</option>        
+                <option value="disco">Disco</option>        
+                <option value="move">Move</option>        
+    		</lightning:select><br/>
+            <lightning:input type="text" aura:id="OrderDescription" name="OrderDescription" label="Order Description"/><br/>
+            <lightning:button variant="neutral" label="Create OFS" title="Create OFS" onclick="{!c.createOFS}"/>
+        </div>
+	</article>
+</div>
+</aura:component>

@@ -1,0 +1,11 @@
+<aura:component controller="AccountController" implements="force:appHostable,force:hasRecordId,flexipage:availableForAllPageTypes" access="global">
+<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>    
+<aura:attribute name="recordId" type="String" />
+<aura:attribute name="disabled" type="Datetime" />
+<aura:attribute name="type" type="String" />
+<div class="slds-modal__header slds-theme--error slds-theme--alert-texture">
+	<h2 class="slds-text-heading_medium">
+    {!v.type} Disabled as of <lightning:formattedDateTime value="{!v.disabled}" year="numeric" month="numeric" day="numeric" hour12="false" />
+    </h2>
+</div>
+</aura:component>

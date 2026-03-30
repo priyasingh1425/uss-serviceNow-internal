@@ -1,0 +1,31 @@
+<!--SC-0000100-->
+<!-- Visualforce page to control bulk costing on the quote line editor-->
+<apex:page showHeader="false" controller="INV_PricingController_UTL" action="{!priceQuote}" lightningStylesheets="true">
+    <apex:includeScript value="/soap/ajax/29.0/connection.js"/>
+    <apex:includeScript value="/support/console/43.0/integration.js"/>
+   <script>
+        function showToast() {
+            if (typeof sforce !== "undefined" && sforce.one) {
+                sforce.one.navigateToURL('/{!$CurrentPage.parameters.id}');
+                sforce.one.showToast({
+                    "title": "Success!",
+                    "message": "Costing successfully initiated. You will receive a notification when it is completed.",
+                    "duration": "5000",
+                    "key": "info_alt",
+                    "type": "success",
+                    "mode": "pester"
+                });
+                
+            } else {
+                alert("Costing successfully initiated. You will receive a notification when it is completed.");
+                window.location.href = "/{!$CurrentPage.parameters.id}";
+              
+            }
+            
+            
+                                                   
+        }
+        window.onload = showToast;
+    
+    </script>
+</apex:page>

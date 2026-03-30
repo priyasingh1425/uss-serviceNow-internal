@@ -1,0 +1,1 @@
+<apex:page standardController="fferpcore__BillingDocument__c" extensions="lp_ConductorFromLVControllerEmailExcelBD" recordSetVar="records" action="{!prepareConductorUrl}"> </apex:page>

@@ -1,0 +1,13 @@
+<design:component label="Banner - Configurable" >
+    <design:attribute name="helpText" label="Component Summary" description="This Banner can include up to 3 text message areas and 3 record fields to display in several color options.  Salesforce removes extra spaces.  To add extra spaces (leading, trailing, multiple spaces between words), go to a blank cell in Excel and type =char(160), then press [Enter], then copy / paste that content to the front of your white-spaced string in SF" default="This Banner can include up to 3 text message areas and 3 record fields to display in several color options.  Salesforce removes extra spaces.  To add extra spaces (leading, trailing, multiple spaces between words), go to a blank cell in Excel and type =char(160), then press [Enter], then copy / paste that content to the front of your white-spaced string in SF"/>
+    <design:attribute name="objectAPIname" label="Object API Name" description="Enter the API Name of the Object that this Banner is on"/>
+    <design:attribute name="message1" label="Message Text 1" description="This text will appear first"/>
+    <design:attribute name="fieldAPIname1" label="Record Field 1" required="true" description="(Optional) Enter the API Name of a field from the record that you would like to appear here  This field MUST contain the text '1' if not in use."/>
+    <design:attribute name="message2" label="Message Text 2" description="(Optional) This text will appear second, after Record Field 1"/>
+    <design:attribute name="fieldAPIname2" label="Record Field 2" required="true" description="(Optional) Enter the API Name of a field from the record that you would like to appear here  This field MUST contain the text '2' if not in use."/>
+    <design:attribute name="message3" label="Message Text 3" description="(Optional) This text will appear third, after Record Field 2"/>
+    <design:attribute name="fieldAPIname3" label="Record Field 3" required="true" description="(Optional) Enter the API Name of a field from the record that you would like to appear here.  This field MUST contain the text '3' if not in use."/>
+    <design:attribute name="textColor" label="Text Color" description="Choose a color for the Banner Text" datasource="apex://BNR_SObject_TextColor_OPT"/>
+    <design:attribute name="backgroundcolor" label="Background Color" description="Choose a color for the Banner Background" datasource="apex://BNR_SObject_BackColor_OPT"/>
+    
+</design:component>

@@ -1,0 +1,19 @@
+<apex:page standardController="SCMImpToolsLoad_Serial_Numbers__c"
+		   extensions="SCMImpToolsLoadSerialNumbers"
+		   sidebar="false" 
+		   recordSetVar="snList"
+           title="Load Serial Number Control Items"
+           action="{!loadSNControlNumbers}">
+	<apex:form >
+		<apex:pageBlock title="Create Purchase Order for Requisitions">
+			<apex:pageBlockButtons >
+				<apex:commandButton action="{!goBackList}" value="Return To List"/>
+			</apex:pageBlockButtons>
+		    <apex:pageBlockSection title="Message" columns="1">
+				<apex:pageBlockSectionItem >
+					A batch job has been kicked off. Please wait before clicking the <strong>Load SN Control Numbers</strong> again, job can take some time to run.
+				</apex:pageBlockSectionItem>
+			</apex:pageBlockSection>
+		</apex:pageBlock>
+	</apex:form>
+</apex:page>

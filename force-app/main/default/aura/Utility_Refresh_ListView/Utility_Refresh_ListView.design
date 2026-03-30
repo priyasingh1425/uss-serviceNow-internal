@@ -1,0 +1,4 @@
+<design:component label="Refresh List Utility">
+    <design:attribute name="refreshInterval" label="Refresh Interval" default="60" description="Set a smaller number for a more frequent refreshes, a larger number for fewer."/>
+    <design:attribute name="availableForObjects" label="Available For" default="Case" description="Comma delimited list of Object API Names this will be available for"/>
+</design:component>

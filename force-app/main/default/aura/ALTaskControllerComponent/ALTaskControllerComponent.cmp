@@ -1,0 +1,189 @@
+<aura:component controller="ALTaskController"
+                implements="flexipage:availableForAllPageTypes,force:appHostable,force:hasRecordId"
+                access="global">
+
+    <aura:attribute name="tasks" type="List" />
+    <aura:attribute name="openTasks" type="List" default="[]"/>
+    <aura:attribute name="completedTasks" type="List" default="[]"/>
+
+    <aura:attribute name="isLoading" type="Boolean" default="false"/>
+    <aura:attribute name="showCreateFlow" type="Boolean" default="false"/>
+    <aura:attribute name="flowInputVariables" type="Object[]"/>
+
+    <aura:attribute name="record" type="Id" />
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:handler event="force:refreshView" action="{!c.doInit}" />
+
+    <lightning:navigation aura:id="navigationService" />
+
+    <lightning:card class="accountCard" variant="Narrow" iconName="standard:task" footer="">
+        <aura:set attribute="title">
+            All Tasks
+        </aura:set>
+
+        <aura:set attribute="actions">
+    <lightning:button variant="neutral"
+                      class="slds-button slds-button_neutral slds-m-right_small"
+                      label="New External Customer Support Tasks"
+                      onclick="{!c.openCreateTaskFlow}"/>
+    <lightning:button variant="neutral"
+                      class="slds-button slds-button_neutral slds-button_dual-stateful"
+                      label="assignmentButton"
+                      onclick="{!c.buttonAction}">
+        <span class="slds-text-not-pressed">
+            Assign External Customer Support Tasks to me
+        </span>
+        <span class="slds-text-pressed">
+            Tasks Assigned to Me
+        </span>
+    </lightning:button>
+</aura:set>
+
+
+        <aura:set attribute="body">
+
+            <!-- Spinner -->
+            <aura:if isTrue="{!v.isLoading}">
+                <lightning:spinner alternativeText="Working..." size="medium"/>
+            </aura:if>
+
+            <!-- Flow Modal -->
+            <aura:if isTrue="{!v.showCreateFlow}">
+                <section role="dialog"
+                         tabindex="-1"
+                         aria-modal="true"
+                         class="slds-modal slds-fade-in-open">
+                    <div class="slds-modal__container">
+                        <header class="slds-modal__header">
+                            <lightning:buttonIcon iconName="utility:close"
+                                                  alternativeText="Close"
+                                                  class="slds-modal__close"
+                                                  onclick="{!c.closeCreateTaskFlow}"/>
+                            <h2 class="slds-text-heading_medium">Create Tasks</h2>
+                        </header>
+
+                        <div class="slds-modal__content slds-p-around_medium">
+                            <lightning:flow aura:id="createTaskFlow"
+                                            onstatuschange="{!c.handleFlowStatusChange}"/>
+                        </div>
+
+                        <footer class="slds-modal__footer">
+                            <lightning:button variant="neutral"
+                                              label="Close"
+                                              onclick="{!c.closeCreateTaskFlow}"/>
+                        </footer>
+                    </div>
+                </section>
+                <div class="slds-backdrop slds-backdrop_open"></div>
+            </aura:if>
+
+            <!-- Scroll container -->
+            <div class="alTaskScroll slds-p-horizontal_small">
+
+                <!-- Open section -->
+                <div class="slds-text-title_bold slds-m-vertical_small">Open</div>
+
+                <aura:if isTrue="{!v.openTasks.length == 0}">
+                    <div class="slds-text-color_weak slds-m-bottom_small">No open tasks.</div>
+                </aura:if>
+
+                <aura:iteration items="{!v.openTasks}" var="task">
+                    <lightning:tile label="{!task.Subject}" href="{!'/one/one.app?#/sObject/'+ task.Id + '/view'}">
+                        <aura:set attribute="media">
+                            <lightning:input type="checkbox"
+                                             name="input1"
+                                             title="Mark Complete"
+                                             value="{!task}"
+                                             onchange="{!c.updateStatus}"/>
+                        </aura:set>
+
+                        <div class="demo-only demo-only--sizing slds-grid slds-wrap slds-border_top">
+                            <div class="slds-size_1-of-6"><p class="slds-truncate">Task Sequence</p></div>
+                            <div class="slds-size_1-of-6"><p class="slds-truncate">Due Date:</p></div>
+                            <div class="slds-size_1-of-6"><p class="slds-truncate">Status:</p></div>
+                            <div class="slds-size_1-of-6"><p class="slds-truncate">Assigned To:</p></div>
+                            <div class="slds-size_1-of-6"><p class="slds-truncate">Record Type:</p></div>
+                            <div class="slds-size_1-of-6"><p class="slds-truncate"></p></div>
+
+                            <div class="slds-size_1-of-6"><p class="slds-truncate">{!task.Task_Sequence__c}</p></div>
+                            <div class="slds-size_1-of-6">
+                                <p class="slds-truncate">
+                                    <lightning:formattedDateTime value="{!task.ActivityDate}" year="numeric" month="numeric" day="numeric" timeZone="UTC"/>
+                                </p>
+                            </div>
+                            <div class="slds-size_1-of-6"><p class="slds-truncate">{!task.Status}</p></div>
+                            <div class="slds-size_1-of-6" title="{!task.Owner.Name}"><p class="slds-truncate">{!task.Owner.Name}</p></div>
+                            <div class="slds-size_1-of-6" title="{!task.RecordType.Name}"><p class="slds-truncate">{!task.RecordType.Name}</p></div>
+
+                            <div class="slds-size_1-of-6" title="Link to Procedure">
+                                <p class="slds-truncate">
+                                    <aura:if isTrue="{!task.Procedure_URL__c != null}">
+                                        <lightning:buttonIcon alternativeText="Link to Procedure"
+                                                              iconName="utility:link"
+                                                              onclick="{!c.goToProcedure}"
+                                                              value="{!task.Procedure_URL__c}"
+                                                              name="{!task.Procedure_URL__c}"/>
+                                    </aura:if>
+                                </p>
+                            </div>
+                        </div>
+                    </lightning:tile>
+                </aura:iteration>
+
+                <!-- Divider -->
+                <div class="slds-border_top slds-m-vertical_medium" role="separator" aria-hidden="true"></div>
+
+                <!-- Completed section -->
+                <div class="slds-text-title_bold slds-m-vertical_small">Completed</div>
+
+                <aura:if isTrue="{!v.completedTasks.length == 0}">
+                    <div class="slds-text-color_weak">No completed tasks.</div>
+                </aura:if>
+
+                <aura:iteration items="{!v.completedTasks}" var="task">
+                    <lightning:tile label="{!task.Subject}" href="{!'/one/one.app?#/sObject/'+ task.Id + '/view'}">
+                        <aura:set attribute="media">
+                            <lightning:input type="checkbox"
+                                             name="inputCompleted"
+                                             title="Completed"
+                                             disabled="true"/>
+                        </aura:set>
+
+                        <div class="demo-only demo-only--sizing slds-grid slds-wrap slds-border_top">
+                            <div class="slds-size_1-of-6"><p class="slds-truncate">Task Sequence</p></div>
+                            <div class="slds-size_1-of-6"><p class="slds-truncate">Due Date:</p></div>
+                            <div class="slds-size_1-of-6"><p class="slds-truncate">Status:</p></div>
+                            <div class="slds-size_1-of-6"><p class="slds-truncate">Assigned To:</p></div>
+                            <div class="slds-size_1-of-6"><p class="slds-truncate">Record Type:</p></div>
+                            <div class="slds-size_1-of-6"><p class="slds-truncate"></p></div>
+
+                            <div class="slds-size_1-of-6"><p class="slds-truncate">{!task.Task_Sequence__c}</p></div>
+                            <div class="slds-size_1-of-6">
+                                <p class="slds-truncate">
+                                    <lightning:formattedDateTime value="{!task.ActivityDate}" year="numeric" month="numeric" day="numeric" timeZone="UTC"/>
+                                </p>
+                            </div>
+                            <div class="slds-size_1-of-6"><p class="slds-truncate">{!task.Status}</p></div>
+                            <div class="slds-size_1-of-6" title="{!task.Owner.Name}"><p class="slds-truncate">{!task.Owner.Name}</p></div>
+                            <div class="slds-size_1-of-6" title="{!task.RecordType.Name}"><p class="slds-truncate">{!task.RecordType.Name}</p></div>
+
+                            <div class="slds-size_1-of-6" title="Link to Procedure">
+                                <p class="slds-truncate">
+                                    <aura:if isTrue="{!task.Procedure_URL__c != null}">
+                                        <lightning:buttonIcon alternativeText="Link to Procedure"
+                                                              iconName="utility:link"
+                                                              onclick="{!c.goToProcedure}"
+                                                              value="{!task.Procedure_URL__c}"
+                                                              name="{!task.Procedure_URL__c}"/>
+                                    </aura:if>
+                                </p>
+                            </div>
+                        </div>
+                    </lightning:tile>
+                </aura:iteration>
+
+            </div>
+        </aura:set>
+    </lightning:card>
+</aura:component>

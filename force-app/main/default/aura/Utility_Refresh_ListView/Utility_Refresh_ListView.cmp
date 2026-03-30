@@ -1,0 +1,21 @@
+<aura:component implements="lightning:utilityItem">
+  <aura:attribute name="refreshInterval" type="Integer" 
+                  default="60" />
+  <aura:attribute name="availableForObjects" type="String" default="Case"/>
+  <aura:attribute name="refreshing" type="Boolean" 
+                  default="false" access="private" />
+  <aura:attribute name="intervalId" type="String" 
+                  access="private" />
+      <!-- Needed to refresh the list -->
+        <lightning:navigationItemAPI aura:id="navigationItemAPI"/>
+    <div>
+        <p>
+            Toggle List View Auto-Refresh
+        </p>
+    </div>
+        <lightning:button label="{!if(v.refreshing, 'Stop', 'Start')}" 
+                          onclick="{!c.toggleAutoRefresh}"
+                          >
+        </lightning:button>
+
+</aura:component>

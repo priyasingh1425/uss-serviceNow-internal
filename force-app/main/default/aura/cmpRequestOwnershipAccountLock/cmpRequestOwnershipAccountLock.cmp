@@ -1,0 +1,11 @@
+<aura:component controller="AccountController" implements="force:appHostable,force:hasRecordId,flexipage:availableForAllPageTypes" access="global">
+<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>    
+<aura:attribute name="recordId" type="String" />
+<aura:attribute name="newowner" type="String" />
+<aura:attribute name="newownertext" type="String" />
+<div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_warning" role="alert">
+	<h2 class="slds-text-heading_medium">
+        {!v.type} Record Locked - <lightning:formattedText value="{!v.newownertext}" /> has requested Account ownership
+    </h2>
+</div>
+</aura:component>

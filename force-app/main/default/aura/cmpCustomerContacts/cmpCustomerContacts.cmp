@@ -1,0 +1,72 @@
+<aura:component controller="ContactController" implements="force:appHostable,force:hasRecordId,flexipage:availableForAllPageTypes" access="global">
+<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>    
+<aura:attribute name="recordId" type="String" />
+<aura:attribute name="title" type="String" />
+<aura:attribute name="contacts" type="Contact[]" />
+<div class="slds-card slds-card_boundary">
+	<article class="slds-card">
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <span class="slds-icon_container slds-icon-standard-contact" title="Contact">
+                        <lightning:icon iconName="standard:contact" />
+                    </span>
+                </div>
+                <div class="slds-media__body">
+                    <h2 class="slds-card__header-title">
+                        <a href="javascript:void(0);" class="slds-card__header-link slds-truncate" title="Contacts">
+                            <span>{!v.title}</span>
+                        </a>
+                    </h2>
+                </div>
+            </header>
+        </div>
+        <div class="slds-card__body slds-card__body_inner">
+            <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+                <thead>
+                    <tr class="slds-text-title_caps">
+                        <th scope="col">
+                            <div class="slds-truncate" title="Name">Name</div>
+                        </th>
+                        <th scope="col">
+                            <div class="slds-truncate" title="CRM ID">CRM ID</div>
+                        </th>
+                        <th scope="col">
+                            <div class="slds-truncate" title="Phone">Phone</div>
+                        </th>
+                        <th scope="col">
+                            <div class="slds-truncate" title="Email">Email</div>
+                        </th>
+                        <th scope="col">
+                            <div class="slds-truncate" title="Roles">Roles</div>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <aura:iteration items="{!v.contacts}" var="con">
+                        <tr>
+                            <td data-label="Name">
+                                <div aura:id="Name" class="slds-truncate">
+                                    <lightning:formattedUrl value="{!'/'+ con.Id}" label="{!con.Name}" target="_blank" />
+                                </div>
+                            </td>
+                            <td data-label="CRM ID">
+                                <div class="slds-truncate">{!con.CRM_ID__c}</div>
+                            </td>
+                            <td data-label="Phone">
+                                <div class="slds-truncate">{!con.Phone}</div>
+                            </td>
+                            <td data-label="Email">
+                                <div class="slds-truncate">{!con.Email}</div>
+                            </td>
+                            <td data-label="Roles">
+                                <div class="slds-truncate">{!con.Roles__c}</div>
+                            </td>
+                        </tr>
+                    </aura:iteration>
+                </tbody>
+            </table>   
+        </div>
+	</article>
+</div>
+</aura:component>

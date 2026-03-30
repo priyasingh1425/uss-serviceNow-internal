@@ -1,0 +1,20 @@
+<apex:page id="lp_ECMSConvertToAFC" standardController="ECMS_Certificate__c" recordSetVar="certificates" showHeader="false">
+    <apex:includeLightning />
+    <apex:slds />
+
+    <div id="lightning"/>
+
+    <script>
+        var component;
+        document.addEventListener('lightning__showtoast', event => {
+            sforce.one.showToast(event.toastAttributes);
+        });
+        $Lightning.use("c:lp_LightningOut", function() {
+            $Lightning.createComponent(
+                "c:lp_ECMSConvertToAFC",
+                { },
+                "lightning"
+            );
+        });
+    </script>
+</apex:page>

@@ -1,0 +1,40 @@
+.THIS.customDefaultBack {
+    background-color: red;
+}
+.THIS.backOrange {
+    background-color: orange;
+}
+.THIS.backYellow {
+    background-color: yellow;
+}
+.THIS.backGreen {
+    background-color: green;
+}
+.THIS.backGrey {
+    background-color: grey;
+}
+.THIS.backBlack {
+    background-color: black;
+}
+
+.THIS.customDefaultText {
+    color: black;
+}
+.THIS.textRed {
+    color: red;
+}
+.THIS.textOrange {
+    color: orange;
+}
+.THIS.textYellow {
+    color: yellow;
+}
+.THIS.textGreen {
+    color: green;
+}
+.THIS.textGrey {
+    color: grey;
+}
+.THIS.textWhite {
+    color: white;
+}

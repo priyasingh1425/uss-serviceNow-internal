@@ -1,0 +1,11 @@
+// Mock class for failure scenarios
+@IsTest
+public class HLP_MockHttpFailureResponseGenerator_TST implements HttpCalloutMock {
+    public HTTPResponse respond(HTTPRequest req) {
+        HttpResponse res = new HttpResponse();
+        res.setHeader('Content-Type', 'application/json');
+        res.setBody('{"error":"API call failed"}');
+        res.setStatusCode(500);
+        return res;
+    }
+}

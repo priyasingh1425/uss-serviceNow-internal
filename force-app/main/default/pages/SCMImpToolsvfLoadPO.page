@@ -1,0 +1,18 @@
+<apex:page standardController="SCMImpToolsPO_Stage__c"  
+			recordSetVar="loadPO"  
+			extensions="SCMImpToolsLoadPO" 
+			action="{!process}"
+			title="Load Purchase Orders">
+	<apex:form >
+		<apex:pageBlock title="Load Purchase Orders from staging table">
+  			<apex:pageBlockButtons >
+      			<apex:commandButton action="{!goBack}" value="Back"/>
+  			</apex:pageBlockButtons>
+			<apex:pageBlockSection title="Warnings and Errors Associated loading Purchase Orders" columns="1">
+				<apex:pageBlockSectionItem >
+	  	  			<apex:pageMessages />
+	  			</apex:pageBlockSectionItem>
+  			</apex:pageBlockSection>
+		</apex:pageBlock>
+	</apex:form>
+</apex:page>

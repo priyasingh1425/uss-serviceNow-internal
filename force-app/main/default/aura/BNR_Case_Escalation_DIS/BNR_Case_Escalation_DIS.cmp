@@ -1,0 +1,10 @@
+<aura:component controller="BNR_Case_Escalation_CTRL" implements="force:appHostable,force:hasRecordId,flexipage:availableForAllPageTypes" access="global">
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>    
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="escalation" type="String" />
+    <div class="yellow slds-modal__header">
+        <h2 class="slds-text-heading_medium">
+            Case has been escalated to: {!v.escalation}
+        </h2>
+    </div>
+</aura:component>

@@ -1,0 +1,42 @@
+<aura:component implements="flexipage:availableForRecordHome,force:appHostable,force:hasRecordId" access="global">
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+    <aura:attribute name="record" type="Id"/>
+    <aura:attribute name="showFlowOne" type="Boolean" default="false"/>
+    <aura:attribute name="showFlowTwo" type="Boolean" default="false"/>
+    <aura:handler event="force:refreshView" action="{!c.init}" />
+    	<div class="slds-grid slds-grid_align-end slds-wrap">
+            <div class="slds-col slds-small-size slds-p-left_xx-small">
+                <lightning:button 
+                                  variant="brand" 
+                                  label="Case Transfer/Assistance" 
+                                  title="Transer case or get assistance"
+                                  onclick="{!c.onclickTwo}"/>
+                <aura:if isTrue="{!v.showFlowTwo}">
+                    <section role="dialog" tabindex="-1" aria-label="Create New Quick Text" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                        <div class="slds-modal__container">
+                            <header class="slds-modal__header">
+                                <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick="{!c.closeModalBtn}">
+                                    <lightning:icon iconName="utility:close" size="small" variant="neutral"/>
+                                    <span class="slds-assistive-text">Close</span>
+                                </button>
+                            </header>
+                            <div class="slds-modal__content slds-p-around_medium alignCenter" id="modal-content-id-1">
+                                <lightning:flow aura:id="Flow_Case_Transfer_or_Assistance" onstatuschange="{!c.handleStatusChange}"/>
+                            </div>
+                        </div>
+                    </section>
+                    <div class="slds-backdrop slds-backdrop_open"></div>
+                </aura:if>
+            </div>
+    		<div class="slds-col slds-small-size slds-p-left_xx-small">
+                <lightning:button 
+                                  variant="brand" 
+                                  label="Take Case Ownership" 
+                                  title="Take case ownership"
+                                  onclick="{!c.onclickOne}"/>
+                <aura:if isTrue="{!v.showFlowOne}">
+                    <lightning:flow aura:id="Flow_Case_Auto_Assignment" onstatuschange="{!c.handleStatusChange}"/> 
+                </aura:if>
+        	</div>
+    	</div>
+</aura:component>

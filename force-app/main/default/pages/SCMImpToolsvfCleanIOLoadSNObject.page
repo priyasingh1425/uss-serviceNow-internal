@@ -1,0 +1,20 @@
+<apex:page standardController="SCMImpToolsLoad_Serial_Numbers__c"
+		   extensions="SCMImpToolsLoadSerialNumbers"
+		   sidebar="false" 
+		   recordSetVar="snList"
+           title="Clear Load Serial Number Object"
+           action="{!clearLoadObject}">
+	<apex:form >
+		<apex:pageBlock title="Create Purchase Order for Requisitions">
+			<apex:pageBlockButtons >
+				<apex:commandButton action="{!goBackList}" value="Return To List"/>
+			</apex:pageBlockButtons>
+		    <apex:pageBlockSection title="Message" columns="1">
+				<apex:pageBlockSectionItem >
+					A batch job has been kicked off. Please wait before clicking the <strong>Clear Load Serial Numbers</strong> again, job can take some time to run.
+					<div style="font-size: 10px; font-style:italic; padding: 2px 0 0 0;">Note: Error and unsaved records will not be removed.</div>
+				</apex:pageBlockSectionItem>
+			</apex:pageBlockSection>
+		</apex:pageBlock>
+	</apex:form>
+</apex:page>

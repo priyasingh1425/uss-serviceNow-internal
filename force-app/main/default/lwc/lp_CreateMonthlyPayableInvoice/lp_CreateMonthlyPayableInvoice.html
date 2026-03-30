@@ -1,0 +1,52 @@
+<template>
+    <template if:true={loading}>
+        <lightning-spinner style="position: fixed;" alternative-text="Loading...">Processing</lightning-spinner>
+        <div style="position: fixed;" class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
+    <div class="slds-page-header slds-page-header_record-home" style="background-color: #dedede;">
+        <div class="slds-grid" style="padding: 15px;">
+            <div class="slds-col slds-has-flexi-truncate">
+                <div class="slds-media slds-no-space slds-grow slds-media_center">
+                    <div class="slds-media__figure">
+                        <lightning-icon icon-name="standard:pricing_workspace" alternative-text="Create Monthly Payable Invoice" title="Create Monthly Payable Invoice"></lightning-icon>
+                    </div>
+                    <div class="slds-media__body">
+                        <table cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td style="width: 60%;">
+                                    <h1 class="slds-page-header__title slds-truncate slds-align-middle" title="Create Monthly Payable Invoice">Create Monthly Payable Invoice</h1>
+                                    <p class="slds-page-header__name-meta">{quoteName}</p>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-col slds-no-flex slds-grid slds-align-top">
+                <template if:true={errorMessage}>
+                    <button class="slds-button slds-button_neutral" onclick={back}>Cancel</button>
+                </template>
+                <template if:false={errorMessage}>
+                    <button class="slds-button slds-button_brand" onclick={back}>Back</button>
+                </template>
+            </div>
+        </div>
+    </div>
+
+    <div style="background-color: #fff; padding: 8px 10px;">
+        <template if:true={errorMessage}>
+            <div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_error" role="alert">
+                <span class="slds-assistive-text">error</span>
+                <h2 class="bold-text">{errorMessage}</h2>
+            </div>
+        </template>
+
+        <template if:true={successMessage}>
+            <div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_success" role="alert">
+                <span class="slds-assistive-text">success</span>
+                <h2 class="bold-text">{successMessage}</h2>
+            </div>
+        </template>
+    </div>
+</template>

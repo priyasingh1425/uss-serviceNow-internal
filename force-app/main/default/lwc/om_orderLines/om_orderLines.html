@@ -1,0 +1,28 @@
+<template>
+  <template for:each={recordMapValues} for:item="record">
+    <lightning-card key={record.id} title={record.label}>
+      <lightning-tabset>
+        <template for:each={record.rows} for:item="row">
+          <lightning-tab key={row.id} label={row.label}>
+            <lightning-record-edit-form record-id={row.id} object-api-name="OrderItem">
+              <lightning-messages></lightning-messages>
+              <lightning-input-field field-name="External_Quote_Id__c"></lightning-input-field>
+              <lightning-input-field field-name="Location__c"></lightning-input-field>
+              <lightning-input-field field-name="Customer_Service_Location__c"></lightning-input-field>
+              <lightning-input-field field-name="Customer_Reference__c"></lightning-input-field>
+              <lightning-input-field field-name="Order_Notes__c"></lightning-input-field>
+              <template for:each={row.fieldSets} for:item="fieldSet">
+                <c-om_field-set-data
+                  key={fieldSet}
+                  object-name="OrderItem"
+                  field-set-name={fieldSet}
+                ></c-om_field-set-data>
+              </template>
+              <lightning-button variant="brand" type="submit" label="Save"></lightning-button>
+            </lightning-record-edit-form>
+          </lightning-tab>
+        </template>
+      </lightning-tabset>
+    </lightning-card>
+  </template>
+</template>

@@ -1,0 +1,113 @@
+<!-- SC-0000100 -->
+<template>
+    <template lwc:if={spinner}>
+        <div class="exampleHolder">
+            <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+        </div>
+        </template>
+
+    <template if:true={isUpload}>
+        <lightning-input type="file" accept=".csv" onchange={handleCsvFile}></lightning-input>&nbsp;&nbsp;&nbsp;
+        <a href={fileUrl} download="SampleQuoteAddressUploadFile.csv">Click here to download
+        sample CSV</a>
+        
+        <p><b>Guidelines for the CSV file:</b></p>
+        <ul style="list-style-type: disc; margin-left: 20px;">
+            <li>The street, city, and state columns are necessary to be filled out</li>
+            <li>For single access point addresses, do not fill in for A and Z address columns</li>
+            <li>For dual access point addresses, every A-address should have a corresponding Z-address and vice versa</li>
+        </ul>
+    </template>
+    <template if:true={isSuccess}>
+        <img src={successGif} alt="Success"/>
+        <p class="slds-align_absolute-center">The quote addresses have been created successfully!</p>
+    </template>
+    <!-- <template if:true={showAccordian}>
+        <div class="slds-modal__container slds-modal slds-fade-in-open" >
+            <lightning-accordion allow-multiple-sections>
+                <template for:each={accordionData} for:item="item" for:index="index">
+                    <lightning-accordion-section
+                        label={item}
+                        key={item}>
+                        <lightning-radio-group
+                            label="Choose one"
+                            options={addressData}
+                            value={selectedValue}
+                            type="radio"
+                            onchange={handleRadioChange}>
+                        </lightning-radio-group>
+                    </lightning-accordion-section> 
+                </template>
+            </lightning-accordion>
+        </div>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template> -->
+
+    <template if:true={showAccordian}>
+        <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                
+                <header class="slds-modal__header">
+                    <!-- <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModal}>
+                        <lightning-icon icon-name="utility:close" size="small" alternative-text="close" class="slds-button__icon slds-button__icon_large"></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button> -->
+                    <h2 class="slds-text-heading_medium" style="font-weight: bold;">Select Addresses</h2>
+                </header>
+                
+                <div class="slds-modal__content slds-p-around_medium" style="max-height: 400px; overflow-y: auto;">
+                    <lightning-accordion allow-multiple-sections>
+                        <!-- <template for:each={accordionData} for:item="item" for:index="index">
+                            <lightning-accordion-section label={item} key={item}>
+                                <div class="slds-list_horizontal">
+                                    <lightning-radio-group
+                                        label="Select correct address"
+                                        options={addressData}
+                                        value={selectedValue}
+                                        type="radio"
+                                        onchange={handleRadioChange}>
+                                    </lightning-radio-group>
+                                    <lightning-radio-group
+                                        label=""
+                                        options={addressData2}
+                                        value={selectedValue2}
+                                        type="radio"
+                                        style="padding-top: 18px;"
+                                        onchange={handleRadioChange}>
+                                    </lightning-radio-group>
+                                </div>
+                            </lightning-accordion-section>
+                        </template> -->
+                        <template for:each={accordionData} for:item="section" for:index="index">
+                            <lightning-accordion-section key={section.key} label={section.label}>
+                                <!-- <div class="slds-grid slds-wrap"> -->
+                                    <!-- First Radio Group (options array) -->
+                                    <div class="postal-code-list-formatting">
+                                        <lightning-radio-group
+                                            options={section.options}
+                                            value={section.selectedValue}
+                                            type="radio"
+                                            onchange={handleRadioChange}
+                                            variant="label-hidden"
+                                             data-section-key={section.key}
+                                            >
+                                        </lightning-radio-group>
+                                    </div>
+                            </lightning-accordion-section>
+                        </template>
+
+                    </lightning-accordion>
+                </div>
+
+                <footer class="slds-modal__footer">
+                    <lightning-button variant="neutral" label="Cancel" onclick={closeModal}></lightning-button>
+                    <lightning-button variant="brand" class="slds-p-left_small" label="Confirm" onclick={confirmSelection}></lightning-button>
+                </footer>
+
+            </div>
+        </section>
+    
+        
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+</template>

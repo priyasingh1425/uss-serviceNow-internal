@@ -1,0 +1,28 @@
+<aura:component controller="ContactController" implements="force:appHostable,force:hasRecordId,flexipage:availableForAllPageTypes" access="global">
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>    
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="disabled" type="Datetime" />
+    <aura:attribute name="restricted" type="Integer" />
+    <aura:attribute name="isDisabled" type="Boolean" default="false" />
+    <aura:attribute name="isRestricted" type="Boolean" default="false" />
+    <aura:attribute name="contactChangeEmails" type="List" />
+    
+    <aura:if isTrue="{!v.isDisabled}">
+        <div class="slds-modal__header slds-theme--error slds-theme--alert-texture">
+            <h2 class="slds-text-heading_medium">
+                Contact Disabled as of <lightning:formattedDateTime value="{!v.disabled}" year="numeric" month="numeric" day="numeric" hour12="false" />
+            </h2>
+        </div>
+    </aura:if>
+    <aura:if isTrue="{!v.isRestricted}">
+        <div class="slds-modal__header slds-theme--error slds-theme--alert-texture">
+            <h2 class="slds-text-heading_medium">
+                Contact has restricted roles(s) and cannot be edited.
+                <aura:iteration items="{!v.contactChangeEmails}" var="wrap" indexVar="ind">
+                    <br></br>
+                    Contact is {!wrap.role}. Email {!wrap.email} to request changes.
+                </aura:iteration>
+            </h2>	
+        </div>
+    </aura:if>
+</aura:component>

@@ -1,0 +1,10 @@
+<template>
+  <template if:true={fieldSet.data}>
+    <fieldset key={fieldSet.data.name}>
+      <legend>{fieldSet.data.label}</legend>
+      <template for:each={fieldSet.data.fields} for:item="field">
+        <lightning-input-field key={field} field-name={field}></lightning-input-field>
+      </template>
+    </fieldset>
+  </template>
+</template>

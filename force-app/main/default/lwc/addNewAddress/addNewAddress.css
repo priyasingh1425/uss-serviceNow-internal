@@ -1,0 +1,44 @@
+.custom-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    max-height: 200px; /* Limit the height */
+    overflow-y: auto; /* Make scrollable if too many items */
+    background-color: #ffffff;
+    border: 1px solid #dcdcdc;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    z-index: 10;
+}
+
+.custom-listbox-item {
+    padding: 10px;
+    cursor: pointer;
+}
+
+.custom-listbox-item:hover {
+    background-color: #f4f4f4;
+}
+
+.slds-combobox__form-element {
+    position: relative;
+}
+
+.lwc-container {
+    border: 1px solid #dcdcdc; /* Light gray border */
+    border-radius: 6px; /* Optional: rounded corners */
+    padding: 16px; /* Add padding inside the container */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Optional: subtle shadow */
+    background-color: #ffffff; /* Optional: white background */
+}
+
+.slds-combobox {
+    border: none !important; 
+    background: none !important; 
+    padding: 0 !important; 
+}
+
+.slds-combobox__form-element {
+    border: none !important; 
+}

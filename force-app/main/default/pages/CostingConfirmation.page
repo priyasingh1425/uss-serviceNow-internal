@@ -1,0 +1,85 @@
+<apex:page controller="INV_PricingController_UTL" lightningStylesheets="true">
+    
+    <apex:outputPanel layout="block" style="display: flex; flex-direction: column; width: 100%;">
+        
+            <div style="display: flex; justify-content: center; align-items: center;">
+                <div>
+                    <apex:outputPanel rendered="{!NOT(isProceedClick)}">
+                      <apex:outputText >
+                    <div class="warning">⚠️ System Warning: Important Action Required! ⚠️</div>
+                    <br/>
+                    <p>Have you <strong>QUICK SAVED</strong> this quote?</p>
+                    <p>If you have not, please take the following steps:</p>
+                    <div class="steps">
+                        <ol>
+                            <li>Click the <b>“X”</b> to the right to exit this page.</li>
+                            <li>Navigate to the <strong>QLE</strong> page and ensure you click the <strong>QUICK SAVE</strong> button.</li>
+                        </ol>
+                        <p><strong>Important:</strong> Connectbase WILL NOT retrieve costs unless you click <strong>QUICK SAVE</strong> before proceeding.</p>
+                    </div>
+                    <p>Thank you for your attention to this matter!</p>
+                </apex:outputText>
+                         <apex:form >
+                             <div style="display: flex; justify-content: center; align-items: center;">
+                                  <apex:commandButton value="Proceed" action="{!priceQuote}" 
+                                    style="background-color: #3a86ff; color: white; border: none; font-size: 15px;
+                                           padding: 10px 15px; border-radius: 5px; cursor: pointer; margin-top: 10px;"  /> 
+                             </div>
+               
+            </apex:form>
+        </apex:outputPanel>
+                    
+                    <apex:outputLabel rendered="{!isProceedClick}">
+            <apex:outputText >
+                <h1 class="success-message">
+                    Costing successfully initiated! You will receive a notification when it is completed.
+                    <br/>
+                    <p>You can close this window now.</p> 
+                </h1> 
+            </apex:outputText>
+                           </apex:outputLabel>
+                </div>
+            </div>
+            
+              
+            
+            
+           
+        
+        
+     
+        
+    </apex:outputPanel>
+    <script>
+    function complete(recordId){
+        console.log('Inside complete');
+    window.top.location.href = 'https://ussignal--cbdevpro.sandbox.lightning.force.com/'+recordId;
+    }
+    </script>
+    <style>
+        
+        .warning {
+        font-size: 24px;
+        font-weight: bold;
+        color: #d9534f;
+        text-align: left;
+        margin-bottom: 10px;
+    }
+    .steps {
+        text-align: left;
+        margin-top: 15px;
+        max-width: 600px;
+    }
+        .success-message {
+        font-size: 18px;
+        font-weight: bold;
+        color: #155724;
+        background-color: #d4edda;
+        padding: 15px;
+        border: 2px solid #c3e6cb;
+        border-radius: 5px;
+        text-align: center;
+        max-width: 1000px;
+        }
+    </style>
+</apex:page>

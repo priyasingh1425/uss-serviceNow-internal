@@ -1,0 +1,6 @@
+.THIS .alTaskScroll {
+    max-height: 520px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 0.25rem;
+}

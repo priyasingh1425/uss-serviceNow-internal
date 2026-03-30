@@ -1,0 +1,3 @@
+<apex:page controller="HLP_Home_Announcements_CTL">
+    <chatter:feed entityId="{!groupId}" showPublisher="false"/>
+</apex:page>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ApexPage xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>63.0</apiVersion>
+    <availableInTouch>false</availableInTouch>
+    <confirmationTokenRequired>false</confirmationTokenRequired>
+    <label>lp Billing Document Email Excel Batch List View</label>
+    <packageVersions>
+        <majorNumber>2025</majorNumber>
+        <minorNumber>103</minorNumber>
+        <namespace>fferpcore</namespace>
+    </packageVersions>
+</ApexPage>

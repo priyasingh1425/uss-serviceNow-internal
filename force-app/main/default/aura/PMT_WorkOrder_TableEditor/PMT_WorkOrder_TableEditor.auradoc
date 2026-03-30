@@ -1,0 +1,13 @@
+<aura:documentation>
+    <aura:description>
+        <h4>PMT WorkOrder Table Editor</h4>
+        
+    </aura:description>
+    <aura:example name="PMT WorkOrder Table Editor" ref="PMT WorkOrder Table Editor" label="PMT WorkOrder Table Editor">
+        Lightning dataTable displaying the project related Work Orders to users, including following features:
+        - Filters on Phase, Status and Assignee
+        - Columns sort
+        - Mass edit of work orders using component standard features
+        - Mass edit of work orders using screenFlow for fields having limitations.
+    </aura:example>
+</aura:documentation>

@@ -1,0 +1,33 @@
+<aura:component controller="BNR_Generic_Config_CTL" implements="forceCommunity:availableForAllPageTypes,flexipage:availableForAllPageTypes,force:appHostable,force:hasRecordId" access="global">
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="objectAPIname" type="String"/>
+    <aura:attribute name="message1" type="String" default=""/>
+    <aura:attribute name="fieldAPIname1" type="String" default="1"/>
+    <aura:attribute name="fieldValue1" type="String"/>
+    <aura:attribute name="message2" type="String" default=""/>
+    <aura:attribute name="fieldAPIname2" type="String" default="2"/>
+    <aura:attribute name="fieldValue2" type="String"/>
+    <aura:attribute name="message3" type="String" default=""/>
+    <aura:attribute name="fieldAPIname3" type="String" default="3"/>
+    <aura:attribute name="fieldValue3" type="String"/>
+    <aura:attribute name="textColor" type="String"/>
+    <aura:attribute name="backgroundcolor" type="String"/>
+    <aura:attribute name="helpText" type="String"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+    <div aura:id='customDiv' class="customDefaultBack customDefaultText slds-modal__header" >
+        <h2 class="slds-text-heading_medium">
+            {!v.message1}
+
+            {!v.fieldValue1}
+            
+            {!v.message2}
+
+            {!v.fieldValue2} 
+            
+            {!v.message3}
+            
+            {!v.fieldValue3}    
+        </h2>
+    </div>
+</aura:component>

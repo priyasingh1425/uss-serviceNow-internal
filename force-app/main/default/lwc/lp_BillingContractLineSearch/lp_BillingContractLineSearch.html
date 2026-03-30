@@ -1,0 +1,68 @@
+<template>
+    <lightning-card title="Contract Lines" class="card-title" lwc:if={contractLines.length}>
+        <lightning-button
+            label="Reset"
+            slot="actions"
+            class="slds-p-right_small"
+            brand="destructive"
+            onclick={resetForm}></lightning-button>
+        <lightning-button
+            label="Create Line"
+            slot="actions"
+            variant="brand"
+            onclick={createLine}></lightning-button>
+        <lightning-layout horizontal-align="space" vertical-align="end">
+            <lightning-layout-item size="12" padding="around-small">
+                <lightning-datatable
+                    key-field="id"
+                    data={contractLines}
+                    columns={contractLineColumns}
+                    onrowselection={handleRowSelection}
+                    max-row-selection="1"
+                    show-row-number-column></lightning-datatable>
+            </lightning-layout-item>
+        </lightning-layout>
+    </lightning-card>
+
+    <lightning-card title="Search Contract Line Items" class="card-title" lwc:else>
+        <lightning-button-stateful
+            slot="actions"
+            label-when-off="Search by Circuit"
+            label-when-on="Search by LEC Circuit"
+            icon-name-when-off="utility:toggle_off"
+            icon-name-when-on="utility:toggle_on"
+            varient="inverse"
+            selected={searchByLEC}
+            onclick={handleCircuitSwitch}></lightning-button-stateful>
+        <lightning-layout horizontal-align="center" vertical-align="end">
+            <lightning-layout-item size="8" padding="around-small">
+                <lightning-input
+                    label="Search Term"
+                    value={searchTerm}
+                    data-id="searchInput"
+                    oncommit={handleSearch}
+                    onchange={handleSearchTermChange}></lightning-input>
+            </lightning-layout-item>
+            <lightning-layout-item size="4" padding="around-small">
+                <!-- Spinner here in the layout element to contain it within the quick action modal that houses this lwc -->
+                <template lwc:if={loading}>
+                    <lightning-spinner alternative-text="Loading..."></lightning-spinner>
+                </template>
+                <lightning-button
+                    lwc:else
+                    label="Search"
+                    onclick={handleSearch}
+                    class="slds-m-top_small"></lightning-button>
+            </lightning-layout-item>
+        </lightning-layout>
+        <lightning-layout horizontal-align="start" lwc:if={vendorId}>
+            <lightning-layout-item size="4" padding="around-small">
+                <lightning-input
+                    label="Match Invoice Vendor"
+                    checked={matchVendor}
+                    onclick={handleVendorToggle}
+                    type="checkbox"></lightning-input>
+            </lightning-layout-item>
+        </lightning-layout>
+    </lightning-card>
+</template>

@@ -1,0 +1,150 @@
+<template>
+    <div class="lwc-container slds-combobox_container" style="width: 100%;">
+        <div 
+            class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click"
+            style="width: 100%;"
+            aria-expanded="true" 
+            aria-haspopup="listbox"
+        >
+            <div class="slds-combobox__form-element">
+                <lightning-input 
+                    type="text" 
+                    class="slds-input" 
+                    label="Address" 
+                    value={searchTerm}
+                    onchange={handleSearch}
+                    style="width: 100%;"
+                ></lightning-input>
+            
+                <ul class="slds-listbox custom-dropdown" style="width: 100%;" role="listbox">
+                    <template for:each={searchResults} for:item="item">
+                     <li class="slds-listbox__item custom-listbox-item"
+                        key={item.id}
+                        role="option"
+                        onclick={handleSelect}
+                        data-id={item.id}
+                        data-value={item.displayText}>
+                        <div class="slds-listbox__option slds-media slds-media_small slds-media_center">
+                            <span class="slds-media__body">
+                                <span class="slds-truncate" title={item.displayText}>
+                                    {item.displayText}
+                                </span>
+                            </span>
+                        </div>
+                    </li>
+                    </template>
+                </ul>
+           
+            </div>
+            
+        </div>
+        <div class="slds-form--stacked slds-p-around--medium slds-m-bottom--x-small">
+            <div class="slds-grid">
+                <div class="slds-col slds-size_1-of-2">
+                    <lightning-input type="text" label="Street" name="street" value={street} onchange={handleInputChange}></lightning-input>
+                </div>
+                <div class="slds-col slds-size_1-of-2">
+                    <lightning-input type="text" label="City" name="city" value={city} class="slds-m-left_x-large" onchange={handleInputChange}></lightning-input>
+                </div>
+            </div>
+            <div class="slds-grid">
+                <div class="slds-col slds-size_1-of-2">
+                    <lightning-input type="text" label="State" name="state" value={state} onchange={handleInputChange}></lightning-input>
+                </div>
+                <div class="slds-col slds-size_1-of-2">
+                    <lightning-input type="text" label="Country" name="country" value={country} class="slds-m-left_x-large" onchange={handleInputChange}></lightning-input>
+                </div>
+            </div>
+            <div class="slds-grid">
+                <div class="slds-col slds-size_1-of-2">
+                    <lightning-input type="text" label="Zipcode" name="zipcode" value={zipcode} onchange={handleInputChange}></lightning-input>
+                </div>
+                <div class="slds-col slds-size_1-of-2" if:false={isQuickAction}>
+                    <lightning-input type="checkbox" label="A-Address" name="a-address" value={a_address} checked={a_address} class="slds-m-left_x-large slds-p-top_large" onchange={handleInputChange}>
+
+                    </lightning-input>
+                </div>
+            </div> 
+        </div>
+
+        <!-- if quick Action -->
+        <div if:true={isQuickAction}>
+            <lightning-button variant="brand" label="Save" title="Save" onclick={handleSave} class="slds-float_right"></lightning-button>
+        </div>
+    </div>
+
+     <template if:true={a_address}>
+       
+        <div class="lwc-container slds-combobox_container" style="width: 100%;">
+            <p>Enter Z-Address</p>
+            <div 
+                class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click"
+                style="width: 100%;"
+                aria-expanded="true" 
+                aria-haspopup="listbox"
+            >
+                <div class="slds-combobox__form-element">
+                    <lightning-input 
+                        type="text" 
+                        class="slds-input" 
+                        label="Address" 
+                        value={searchTerm2}
+                        onchange={handleSearch2}
+                        style="width: 100%;"
+                    ></lightning-input>
+                    <ul class="slds-listbox custom-dropdown" style="width: 100%;" role="listbox">
+              
+                        <template for:each={searchResults2} for:item="item">
+
+                            <li class="slds-listbox__item custom-listbox-item"
+                            key={item.id}
+                            role="option"
+                            onclick={handleSelect2}
+                            data-id={item.id}
+                            data-value={item.displayText}>
+                            <div class="slds-listbox__option slds-media slds-media_small slds-media_center">
+                                <span class="slds-media__body">
+                                    <span class="slds-truncate" title={item.displayText}>
+                                        {item.displayText}
+                                    </span>
+                                </span>
+                            </div>
+                    </li>
+
+                        </template>
+    
+
+                    </ul>
+                </div>
+                
+            </div>
+            <div class="slds-form--stacked slds-p-around--medium slds-m-bottom--x-small">
+                <div class="slds-grid">
+                    <div class="slds-col slds-size_1-of-2">
+                        <lightning-input type="text" label="Street" name="z-street" value={z_street} onchange={handleInputChange}></lightning-input>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2">
+                        <lightning-input type="text" label="City" name="z-city" value={z_city} class="slds-m-left_x-large" onchange={handleInputChange}></lightning-input>
+                    </div>
+                </div>
+                <div class="slds-grid">
+                    <div class="slds-col slds-size_1-of-2">
+                        <lightning-input type="text" label="State" name="z-state" value={z_state} onchange={handleInputChange}></lightning-input>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2">
+                        <lightning-input type="text" label="Country" name="z-country" value={z_country} class="slds-m-left_x-large" onchange={handleInputChange}></lightning-input>
+                    </div>
+                </div>
+                <div class="slds-grid">
+                    <div class="slds-col slds-size_1-of-2">
+                        <lightning-input type="text" label="Zipcode" name="z-zipcode" value={z_zipcode} onchange={handleInputChange}></lightning-input>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2">
+                        <lightning-input type="checkbox" label="Z-Address" name="z-address" value={z_address} checked={z_address} class="slds-m-left_x-large slds-p-top_large" disabled="true"></lightning-input>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template> 
+   
+</template>

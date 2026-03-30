@@ -1,0 +1,21 @@
+.slds-modal__content {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    color: #0fa2a0;
+    font-size: 16px;
+    
+}
+
+lightning-radio-group.two-columns .slds-form-element__control {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+lightning-radio-group.two-columns .slds-radio {
+    width: calc(100% / 2); /* divide by the number of columns you want to see */
+}
+
+.postal-code-list-formatting {
+    font-variant-numeric: tabular-nums;
+    column-count: 2;
+}

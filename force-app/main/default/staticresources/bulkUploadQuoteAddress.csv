@@ -1,0 +1,6 @@
+Street,City,State,Zip Code,Country,A_address,Z_address,,"*Street, City, and State are required columns. Please ensure this data is filled out."
+789 Arctic Ave,Virginia Beach,VA,23451,USA,1,,,"*This is a sample record, please delete this before we upload the actual data."
+485 Warren Ave,Washington,VA,22747,USA,,1,,"*For single access point addresses, do not fill in for A and Z address columns."
+123 Main St,Washington,VA,22747,USA,,2,,"*For dual access point addresses, every A-address should have a corresponding Z-address and vice versa."
+256 Main Street,Washington,VA,22747,USA,,,,*The order is not important while filling data. 
+281 van,Washington,VA,22747,USA,2,,,
