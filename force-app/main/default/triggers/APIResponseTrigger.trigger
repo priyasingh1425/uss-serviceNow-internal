@@ -34,13 +34,35 @@ trigger APIResponseTrigger on API_Response__c (after insert) {
     }
 
     if (!casesToUpdate.isEmpty()) {
+        Set<Id> caseIdsToUpdate = new Set<Id>();
+        for (Case c : casesToUpdate) {
+            caseIdsToUpdate.add(c.Id);
+        }
+        Map<Id, Case> existingCases = new Map<Id, Case>(
+            [SELECT Id, Customer_Rec_Id__c FROM Case WHERE Id IN :caseIdsToUpdate]
+        );
+        Set<Id> casesWithBlankRecId = new Set<Id>();
+        for (Case c : existingCases.values()) {
+            if (String.isBlank(c.Customer_Rec_Id__c)) {
+                casesWithBlankRecId.add(c.Id);
+            }
+        }
+
         TriggerBypass.setBypassChangeRequestHandler(true);
         List<Database.SaveResult> results = Database.update(casesToUpdate, false);
         TriggerBypass.setBypassChangeRequestHandler(false);
-        for (Database.SaveResult sr : results) {
-            if (!sr.isSuccess()) {
-                System.debug(LoggingLevel.ERROR, 'APIResponseTrigger: Failed to update Case Customer_Rec_Id__c. Error: ' + sr.getErrors()[0].getMessage());
+
+        Set<Id> syncCaseIds = new Set<Id>();
+        for (Integer i = 0; i < results.size(); i++) {
+            if (results[i].isSuccess() && casesWithBlankRecId.contains(casesToUpdate[i].Id)) {
+                syncCaseIds.add(casesToUpdate[i].Id);
+            } else if (!results[i].isSuccess()) {
+                System.debug(LoggingLevel.ERROR, 'APIResponseTrigger: Failed to update Case Customer_Rec_Id__c. Error: ' + results[i].getErrors()[0].getMessage());
             }
+        }
+
+        if (!syncCaseIds.isEmpty()) {
+            ChangeRequestHandler.syncFeedItemsForCases(syncCaseIds, 'APIResponseTrigger');
         }
     }
 }

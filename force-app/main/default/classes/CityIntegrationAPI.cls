@@ -70,7 +70,7 @@ global with sharing class CityIntegrationAPI {
         Id recordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('External_Customer_Support').getRecordTypeId();
         MPLRequest.CreateIncident payload = (MPLRequest.CreateIncident) JSON.deserialize(body, MPLRequest.CreateIncident.class);
         Case c = new Case();
-        c.Support_Queue__c = 'TOC Support';
+        c.Support_Queue__c = CityIntegrationConstants.SUPPORT_QUEUE_TOC;
         c.RecordTypeid = recordTypeId;
         c.Origin = 'API';
         c.Status = 'New';
@@ -83,7 +83,7 @@ global with sharing class CityIntegrationAPI {
         c.Case_Type__c = mappedCategory;
         c.Description = payload.Description + '\n\nCategory: ' + (String.isNotBlank(payload.Category) ? payload.Category : '') + '\nSub-category: ' + (String.isNotBlank(payload.Subcategory) ? payload.Subcategory : '');
         c.Subject = payload.ShortDescription;
-        c.Priority_Number__c = Integer.valueOf(payload.Priority);
+        c.Priority_Number__c = parsePriorityNumber(payload.Priority);
         c.Priority = getPriorityValue(payload.Priority);
         c.Customer_Rec_Id__c = payload.APITicketID;
         c.AccountId = accId;
@@ -398,7 +398,7 @@ global with sharing class CityIntegrationAPI {
                     c.Planned_Delivery_Date__c = DateTime.valueOf(payload.ScheduledEndDate);
                 }
                 if(payload.Priority != null){
-                    c.Priority_Number__c = Integer.valueOf(payload.Priority);
+                    c.Priority_Number__c = parsePriorityNumber(payload.Priority);
                     c.Priority = getPriorityValue(payload.Priority);
                 }
                 c.AccountId = accId;
@@ -459,7 +459,7 @@ global with sharing class CityIntegrationAPI {
                     ct.Origin = 'API';
                     ct.Status = 'New';
                     if(taskPayload.Priority != null){
-                        ct.Priority_Number__c = Integer.valueOf(taskPayload.Priority);
+                        ct.Priority_Number__c = parsePriorityNumber(taskPayload.Priority);
                         ct.Priority = getPriorityValue(taskPayload.Priority);
                     }
                     if(taskPayload.ScheduledStartDate != null){
@@ -517,6 +517,13 @@ global with sharing class CityIntegrationAPI {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    private static Integer parsePriorityNumber(String priority) {
+        if (String.isBlank(priority) || !priority.trim().isNumeric()) {
+            return null;
+        }
+        return Integer.valueOf(priority.trim());
     }
 
     private static String getPriorityValue(String priority) {
