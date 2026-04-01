@@ -82,6 +82,8 @@ private class TestAPI_ChangeRequestService {
         // 4. Record Type
         Id changeRtId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName()
                             .get('Change_Request').getRecordTypeId();
+        System.assertNotEquals(null, changeRtId,
+            'Record Type "Change_Request" must exist in the target org');
 
         // 5. Parent Case (needed for closeChangeRequest child-check)
         Case parentCase = new Case(

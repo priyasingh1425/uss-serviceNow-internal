@@ -38,6 +38,8 @@ private class TestCityIntegrationAPI {
         // 4. Seed Cases for resolve / reopen / work-note scenarios
         Id extCustRtId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName()
                              .get('External_Customer_Support').getRecordTypeId();
+        System.assertNotEquals(null, extCustRtId,
+            'Record Type "External_Customer_Support" must exist in the target org');
 
         Case reopenCase = new Case(
             Subject            = 'Reopen Test Case',
@@ -107,6 +109,8 @@ private class TestCityIntegrationAPI {
         // 6. Seed a Change Request case with Approval Participants (for approval-update flow)
         Id changeRtId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName()
                             .get('Change_Request').getRecordTypeId();
+        System.assertNotEquals(null, changeRtId,
+            'Record Type "Change_Request" must exist in the target org');
 
         Case changeCase = new Case(
             Subject            = 'Change Request For Approval',
@@ -1205,5 +1209,34 @@ private class TestCityIntegrationAPI {
         Test.stopTest();
 
         System.assertEquals('success', result.status);
+    }
+
+    // ════════════════════════════════════════════════════════════════════
+    //  G11. createIncident — non-numeric Priority (BP3)
+    // ════════════════════════════════════════════════════════════════════
+
+    @isTest
+    static void testCreateIncident_NonNumericPriority() {
+        String payload = JSON.serialize(new Map<String, Object>{
+            'Description'      => 'Non-numeric priority test',
+            'ShortDescription' => 'Non-Numeric Priority',
+            'Priority'         => 'abc',
+            'APITicketID'      => 'INC_NONNUMERIC',
+            'Category'         => 'break fix',
+            'Subcategory'      => ''
+        });
+
+        Test.startTest();
+        setupRestContext('createIncident', payload);
+        MPLResponse result = CityIntegrationAPI.handlePost();
+        Test.stopTest();
+
+        System.assertEquals('success', result.status,
+            'Non-numeric priority should not block incident creation');
+
+        Case c = [SELECT Priority_Number__c, Priority FROM Case
+                  WHERE Customer_Rec_Id__c = 'INC_NONNUMERIC' LIMIT 1];
+        System.assertEquals(null, c.Priority_Number__c,
+            'Priority_Number__c should be null for non-numeric input');
     }
 }

@@ -338,4 +338,38 @@ private class TestApiResponseHelper {
         System.assertEquals('MyService validateInput', logs[0].Message__c,
             'Log Message__c should combine logPrefix and methodName');
     }
+
+    // ════════════════════════════════════════════════════════════════════
+    //  J. processApiResponse — HTTP 503 Service Unavailable (R6)
+    // ════════════════════════════════════════════════════════════════════
+
+    @isTest
+    static void test_processApiResponse_status503_returnsNull_logsFailure() {
+        MulesoftApiClient.HttpDetails details = buildHttpDetails(
+            'POST', 'callout:MulesoftExternalCallout/api/v1/com/change-requests',
+            '{"u_cherwell_rec_id":"500008"}',
+            503, 'Service Unavailable', '{"error":"Service temporarily unavailable"}'
+        );
+
+        Test.startTest();
+        HttpRequestResponseModel.CRCreateResponse resp =
+            ApiResponseHelper.processApiResponse(details, 'TestContext 503', '500008');
+        Test.stopTest();
+
+        System.assertEquals(null, resp,
+            'processApiResponse should return null on HTTP 503');
+
+        List<API_Response__c> logs = [
+            SELECT Success__c, Status_Code__c, Code__c
+            FROM API_Response__c
+        ];
+        System.assertEquals(1, logs.size(),
+            'Exactly one API_Response__c log should be created for 503');
+        System.assertEquals('false', logs[0].Success__c,
+            'Log Success__c should be "false" for HTTP 503');
+        System.assertEquals('503', logs[0].Status_Code__c,
+            'Log Status_Code__c should be "503"');
+        System.assertEquals('Service Unavailable', logs[0].Code__c,
+            'Log Code__c should be "Service Unavailable"');
+    }
 }

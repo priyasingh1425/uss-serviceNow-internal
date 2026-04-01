@@ -7,25 +7,13 @@
  *               - Queueable governor limit fallback logging
  *               - Empty list passthrough
  *               - Multiple eligible FeedItems in a single batch
+ *               - Bulk 200-record governor limit validation
  *
- *               Uses an embedded HttpCalloutMock to absorb cascading callouts
- *               from the enqueued CreateRequestQueueable jobs.
+ *               Uses TestDataFactory.GenericCalloutMock to absorb cascading
+ *               callouts from the enqueued CreateRequestQueueable jobs.
  */
 @isTest
 private class TestFeedItemTriggerHandler {
-
-    // ════════════════════════════════════════════════════════════════════
-    //  MOCK — absorbs callouts from enqueued CreateRequestQueueable
-    // ════════════════════════════════════════════════════════════════════
-
-    private class GenericCalloutMock implements HttpCalloutMock {
-        public HTTPResponse respond(HTTPRequest req) {
-            HttpResponse res = new HttpResponse();
-            res.setStatusCode(200);
-            res.setBody('{"status":"success","result":{"response":"OK"}}');
-            return res;
-        }
-    }
 
     // ════════════════════════════════════════════════════════════════════
     //  TEST SETUP
@@ -53,9 +41,12 @@ private class TestFeedItemTriggerHandler {
         );
         insert settings;
 
-        // 4. Case (serves as FeedItem parent)
+        // 4. Case (serves as FeedItem parent) — with defensive RT assertion (R5)
         Id changeRtId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName()
                             .get('Change_Request').getRecordTypeId();
+        System.assertNotEquals(null, changeRtId,
+            'Record Type "Change_Request" must exist in the target org');
+
         Case c = new Case(
             Subject            = 'FeedItem Handler Case',
             Status             = 'New',
@@ -99,14 +90,14 @@ private class TestFeedItemTriggerHandler {
         // Re-query to get the fully populated FeedItem
         fi = [SELECT Id, ParentId, Body, Visibility, Type FROM FeedItem WHERE Id = :fi.Id];
 
-        TriggerBypass.setFeedItemBypass(true);
+        TriggerBypass.setBypassFeedItemTrigger(true);
 
-        Test.setMock(HttpCalloutMock.class, new GenericCalloutMock());
+        Test.setMock(HttpCalloutMock.class, new TestDataFactory.GenericCalloutMock());
         Test.startTest();
         FeedItemTriggerHandler.afterInsert(new List<FeedItem>{ fi });
         Test.stopTest();
 
-        TriggerBypass.setFeedItemBypass(false);
+        TriggerBypass.setBypassFeedItemTrigger(false);
 
         System.assertEquals(0, Limits.getQueueableJobs(),
             'No queueable jobs should be enqueued when FeedItem bypass is enabled');
@@ -124,7 +115,7 @@ private class TestFeedItemTriggerHandler {
 
         fi = [SELECT Id, ParentId, Body, Visibility, Type FROM FeedItem WHERE Id = :fi.Id];
 
-        Test.setMock(HttpCalloutMock.class, new GenericCalloutMock());
+        Test.setMock(HttpCalloutMock.class, new TestDataFactory.GenericCalloutMock());
         Test.startTest();
         FeedItemTriggerHandler.afterInsert(new List<FeedItem>{ fi });
         Test.stopTest();
@@ -231,7 +222,7 @@ private class TestFeedItemTriggerHandler {
                                 WHERE ParentId = :c.Id AND Type = 'TextPost'
                                 ORDER BY CreatedDate DESC LIMIT 2];
 
-        Test.setMock(HttpCalloutMock.class, new GenericCalloutMock());
+        Test.setMock(HttpCalloutMock.class, new TestDataFactory.GenericCalloutMock());
         Test.startTest();
         FeedItemTriggerHandler.afterInsert(items);
         Test.stopTest();
@@ -261,7 +252,7 @@ private class TestFeedItemTriggerHandler {
                                    FROM FeedItem
                                    WHERE Id IN (:validFi.Id, :invalidFi.Id)];
 
-        Test.setMock(HttpCalloutMock.class, new GenericCalloutMock());
+        Test.setMock(HttpCalloutMock.class, new TestDataFactory.GenericCalloutMock());
         Test.startTest();
         FeedItemTriggerHandler.afterInsert(allItems);
         Test.stopTest();
@@ -311,7 +302,7 @@ private class TestFeedItemTriggerHandler {
 
         fi = [SELECT Id, ParentId, Body, Visibility, Type FROM FeedItem WHERE Id = :fi.Id];
 
-        Test.setMock(HttpCalloutMock.class, new GenericCalloutMock());
+        Test.setMock(HttpCalloutMock.class, new TestDataFactory.GenericCalloutMock());
         Test.startTest();
 
         // Consume the single available queueable slot in test context
@@ -358,5 +349,47 @@ private class TestFeedItemTriggerHandler {
 
         System.assertEquals(0, Limits.getQueueableJobs(),
             'No queueable jobs should be enqueued for FeedItem with null ParentId');
+    }
+
+    // ════════════════════════════════════════════════════════════════════
+    //  L. BULK 200 FEEDITEMS — governor limit validation (BP1)
+    // ════════════════════════════════════════════════════════════════════
+
+    @isTest
+    static void test_afterInsert_bulk200FeedItems_handledGracefully() {
+        Case c = getTestCase();
+
+        // Insert 200 valid FeedItems
+        List<FeedItem> bulkItems = new List<FeedItem>();
+        for (Integer i = 0; i < 200; i++) {
+            FeedItem fi = new FeedItem();
+            fi.ParentId   = c.Id;
+            fi.Body       = 'Bulk work note ' + i;
+            fi.Visibility = 'AllUsers';
+            fi.Type       = 'TextPost';
+            bulkItems.add(fi);
+        }
+        insert bulkItems;
+
+        // Re-query to get fully populated records
+        List<FeedItem> items = [SELECT Id, ParentId, Body, Visibility, Type
+                                FROM FeedItem
+                                WHERE ParentId = :c.Id
+                                AND Type = 'TextPost'
+                                AND Body LIKE 'Bulk work note %'
+                                LIMIT 200];
+        System.assertEquals(200, items.size(),
+            'All 200 FeedItems should have been inserted');
+
+        Test.setMock(HttpCalloutMock.class, new TestDataFactory.GenericCalloutMock());
+        Test.startTest();
+        FeedItemTriggerHandler.afterInsert(items);
+        Test.stopTest();
+
+        // In test context only 1 queueable slot is available.
+        // The handler collects all 200 eligible FeedItems into a single list
+        // and calls System.enqueueJob once, so exactly 1 job is enqueued.
+        System.assertEquals(1, Limits.getQueueableJobs(),
+            'Exactly 1 queueable should be enqueued in test context for 200 FeedItems');
     }
 }

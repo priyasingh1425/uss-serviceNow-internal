@@ -22,18 +22,8 @@
 private class TestCreateRequestQueueable {
 
     // ════════════════════════════════════════════════════════════════════
-    //  MOCK — Generic HttpCalloutMock for all downstream service callouts
+    //  MOCK — Uses TestDataFactory.GenericCalloutMock (centralised R2)
     // ════════════════════════════════════════════════════════════════════
-
-    private class GenericCalloutMock implements HttpCalloutMock {
-        public HTTPResponse respond(HTTPRequest req) {
-            HttpResponse res = new HttpResponse();
-            res.setStatusCode(200);
-            res.setHeader('Content-Type', 'application/json');
-            res.setBody('{"status":"success","message":"Mock response"}');
-            return res;
-        }
-    }
 
     // ════════════════════════════════════════════════════════════════════
     //  TEST SETUP — baseline data
@@ -64,8 +54,12 @@ private class TestCreateRequestQueueable {
         // 4. Record Type Ids
         Id extCustRtId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName()
                              .get('External_Customer_Support').getRecordTypeId();
+        System.assertNotEquals(null, extCustRtId,
+            'Record Type "External_Customer_Support" must exist in the target org');
         Id changeRtId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName()
                             .get('Change_Request').getRecordTypeId();
+        System.assertNotEquals(null, changeRtId,
+            'Record Type "Change_Request" must exist in the target org');
 
         // 5. Cases — External Customer Support variants
         Case resolvedIncCase = new Case(
@@ -204,7 +198,7 @@ private class TestCreateRequestQueueable {
     @isTest
     static void test_processCases_ExtCustSupport_Resolve() {
         Case c = getCaseByCustomerRecId('INC0012345');
-        Test.setMock(HttpCalloutMock.class, new GenericCalloutMock());
+        Test.setMock(HttpCalloutMock.class, new TestDataFactory.GenericCalloutMock());
 
         CreateRequestQueueable job = new CreateRequestQueueable(
             new List<Case>{ c },
@@ -231,7 +225,7 @@ private class TestCreateRequestQueueable {
     @isTest
     static void test_processCases_ExtCustSupport_CreateIncident() {
         Case c = getCaseByCustomerRecId('INC0012346');
-        Test.setMock(HttpCalloutMock.class, new GenericCalloutMock());
+        Test.setMock(HttpCalloutMock.class, new TestDataFactory.GenericCalloutMock());
 
         CreateRequestQueueable job = new CreateRequestQueueable(
             new List<Case>{ c },
@@ -254,7 +248,7 @@ private class TestCreateRequestQueueable {
     @isTest
     static void test_processCases_ExtCustSupport_UpdateStatus() {
         Case c = getCaseByCustomerRecId('INC0012347');
-        Test.setMock(HttpCalloutMock.class, new GenericCalloutMock());
+        Test.setMock(HttpCalloutMock.class, new TestDataFactory.GenericCalloutMock());
 
         CreateRequestQueueable job = new CreateRequestQueueable(
             new List<Case>{ c },
@@ -277,7 +271,7 @@ private class TestCreateRequestQueueable {
     @isTest
     static void test_processCases_ChangeRequest_Close() {
         Case c = getCaseByCustomerRecId('CHG0099999');
-        Test.setMock(HttpCalloutMock.class, new GenericCalloutMock());
+        Test.setMock(HttpCalloutMock.class, new TestDataFactory.GenericCalloutMock());
 
         CreateRequestQueueable job = new CreateRequestQueueable(
             new List<Case>{ c },
@@ -300,7 +294,7 @@ private class TestCreateRequestQueueable {
     @isTest
     static void test_processCases_ChangeRequest_CreateCR() {
         Case c = getCaseByCustomerRecId('CHG0098888');
-        Test.setMock(HttpCalloutMock.class, new GenericCalloutMock());
+        Test.setMock(HttpCalloutMock.class, new TestDataFactory.GenericCalloutMock());
 
         CreateRequestQueueable job = new CreateRequestQueueable(
             new List<Case>{ c },
@@ -323,7 +317,7 @@ private class TestCreateRequestQueueable {
     @isTest
     static void test_processCases_PriorityUpdate() {
         Case c = getCaseByCustomerRecId('INC0012348');
-        Test.setMock(HttpCalloutMock.class, new GenericCalloutMock());
+        Test.setMock(HttpCalloutMock.class, new TestDataFactory.GenericCalloutMock());
 
         CreateRequestQueueable job = new CreateRequestQueueable(
             new List<Case>{ c },
@@ -357,7 +351,7 @@ private class TestCreateRequestQueueable {
         );
         insert t;
 
-        Test.setMock(HttpCalloutMock.class, new GenericCalloutMock());
+        Test.setMock(HttpCalloutMock.class, new TestDataFactory.GenericCalloutMock());
 
         CreateRequestQueueable job = new CreateRequestQueueable(
             new List<Case>(),
@@ -391,7 +385,7 @@ private class TestCreateRequestQueueable {
         );
         insert fi;
 
-        Test.setMock(HttpCalloutMock.class, new GenericCalloutMock());
+        Test.setMock(HttpCalloutMock.class, new TestDataFactory.GenericCalloutMock());
 
         CreateRequestQueueable job = new CreateRequestQueueable(
             new List<Case>(),
@@ -423,7 +417,7 @@ private class TestCreateRequestQueueable {
         );
         insert fi;
 
-        Test.setMock(HttpCalloutMock.class, new GenericCalloutMock());
+        Test.setMock(HttpCalloutMock.class, new TestDataFactory.GenericCalloutMock());
 
         CreateRequestQueueable job = new CreateRequestQueueable(
             new List<Case>(),
@@ -475,7 +469,7 @@ private class TestCreateRequestQueueable {
 
     @isTest
     static void test_execute_EmptyLists_CompletesGracefully() {
-        Test.setMock(HttpCalloutMock.class, new GenericCalloutMock());
+        Test.setMock(HttpCalloutMock.class, new TestDataFactory.GenericCalloutMock());
 
         CreateRequestQueueable job = new CreateRequestQueueable(
             new List<Case>(),
@@ -508,7 +502,7 @@ private class TestCreateRequestQueueable {
         );
         insert fi;
 
-        Test.setMock(HttpCalloutMock.class, new GenericCalloutMock());
+        Test.setMock(HttpCalloutMock.class, new TestDataFactory.GenericCalloutMock());
 
         CreateRequestQueueable job = new CreateRequestQueueable(
             new List<Case>(),
@@ -541,7 +535,7 @@ private class TestCreateRequestQueueable {
         );
         insert fi;
 
-        Test.setMock(HttpCalloutMock.class, new GenericCalloutMock());
+        Test.setMock(HttpCalloutMock.class, new TestDataFactory.GenericCalloutMock());
 
         CreateRequestQueueable job = new CreateRequestQueueable(
             new List<Case>(),
@@ -573,7 +567,7 @@ private class TestCreateRequestQueueable {
         );
         insert t;
 
-        Test.setMock(HttpCalloutMock.class, new GenericCalloutMock());
+        Test.setMock(HttpCalloutMock.class, new TestDataFactory.GenericCalloutMock());
 
         CreateRequestQueueable job = new CreateRequestQueueable(
             new List<Case>(),
@@ -597,7 +591,7 @@ private class TestCreateRequestQueueable {
 
     @isTest
     static void test_processFeedItems_NullEntries_HandledGracefully() {
-        Test.setMock(HttpCalloutMock.class, new GenericCalloutMock());
+        Test.setMock(HttpCalloutMock.class, new TestDataFactory.GenericCalloutMock());
 
         // Pass a list with a FeedItem that has no Id (simulates null Id scenario)
         FeedItem nullIdFeed = new FeedItem();

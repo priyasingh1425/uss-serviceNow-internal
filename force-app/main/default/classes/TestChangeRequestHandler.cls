@@ -9,25 +9,14 @@
  *               - New CR/INC number FeedItem back-sync
  *               - Task eligibility filtering (status + subject changes)
  *               - Queueable governor limit fallback logging
+ *               - Direct syncFeedItemsForCases() coverage
+ *               - Bulk 200-record governor limit validation
  *
- *               Uses an embedded HttpCalloutMock to absorb cascading callouts
- *               from the enqueued CreateRequestQueueable jobs.
+ *               Uses TestDataFactory.GenericCalloutMock to absorb cascading
+ *               callouts from the enqueued CreateRequestQueueable jobs.
  */
 @isTest
 private class TestChangeRequestHandler {
-
-    // ════════════════════════════════════════════════════════════════════
-    //  MOCK — absorbs callouts from enqueued CreateRequestQueueable
-    // ════════════════════════════════════════════════════════════════════
-
-    private class GenericCalloutMock implements HttpCalloutMock {
-        public HTTPResponse respond(HTTPRequest req) {
-            HttpResponse res = new HttpResponse();
-            res.setStatusCode(200);
-            res.setBody('{"status":"success","result":{"response":"OK"}}');
-            return res;
-        }
-    }
 
     // ════════════════════════════════════════════════════════════════════
     //  TEST SETUP
@@ -55,11 +44,16 @@ private class TestChangeRequestHandler {
         );
         insert settings;
 
-        // 4. Record Type IDs
+        // 4. Record Type IDs — with defensive assertions (R5)
         Id changeRtId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName()
                             .get('Change_Request').getRecordTypeId();
+        System.assertNotEquals(null, changeRtId,
+            'Record Type "Change_Request" must exist in the target org');
+
         Id extSupportRtId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName()
                                 .get('External_Customer_Support').getRecordTypeId();
+        System.assertNotEquals(null, extSupportRtId,
+            'Record Type "External_Customer_Support" must exist in the target org');
 
         // 5. Change Request Case (for status/priority/tech approval tests)
         Case crCase = new Case(
@@ -106,7 +100,19 @@ private class TestChangeRequestHandler {
         );
         insert fi;
 
-        // 9. Task for afterTaskUpdate tests
+        // 9. Case for syncFeedItemsForCases — no FeedItems scenario
+        Case noFeedCase = new Case(
+            Subject      = 'No FeedItem Case',
+            Status       = 'New',
+            RecordTypeId = changeRtId,
+            AccountId    = acc.Id,
+            ContactId    = con.Id,
+            Origin       = 'Phone',
+            Priority     = 'Medium'
+        );
+        insert noFeedCase;
+
+        // 10. Task for afterTaskUpdate tests
         Task t = new Task(
             Subject            = 'CR Task',
             Status             = 'Not Started',
@@ -115,7 +121,7 @@ private class TestChangeRequestHandler {
         );
         insert t;
 
-        // 10. Task without Customer_Rec_Id__c (ineligible)
+        // 11. Task without Customer_Rec_Id__c (ineligible)
         Task tIneligible = new Task(
             Subject = 'Ineligible Task',
             Status  = 'Not Started',
@@ -152,15 +158,15 @@ private class TestChangeRequestHandler {
         List<Case> newList = new List<Case>{ newCase };
 
         // Enable bypass
-        TriggerBypass.setChangeRequestBypass(true);
+        TriggerBypass.setBypassChangeRequestHandler(true);
 
-        Test.setMock(HttpCalloutMock.class, new GenericCalloutMock());
+        Test.setMock(HttpCalloutMock.class, new TestDataFactory.GenericCalloutMock());
         Test.startTest();
         ChangeRequestHandler.afterUpdate(oldMap, newList);
         Test.stopTest();
 
         // Reset bypass for other tests
-        TriggerBypass.setChangeRequestBypass(false);
+        TriggerBypass.setBypassChangeRequestHandler(false);
 
         System.assertEquals(0, Limits.getQueueableJobs(),
             'No queueable jobs should be enqueued when bypass is enabled');
@@ -216,7 +222,7 @@ private class TestChangeRequestHandler {
         Map<Id, Case> oldMap = new Map<Id, Case>{ c.Id => oldCase };
         List<Case> newList = new List<Case>{ newCase };
 
-        Test.setMock(HttpCalloutMock.class, new GenericCalloutMock());
+        Test.setMock(HttpCalloutMock.class, new TestDataFactory.GenericCalloutMock());
         Test.startTest();
         ChangeRequestHandler.afterUpdate(oldMap, newList);
         Test.stopTest();
@@ -240,7 +246,7 @@ private class TestChangeRequestHandler {
         Map<Id, Case> oldMap = new Map<Id, Case>{ c.Id => oldCase };
         List<Case> newList = new List<Case>{ newCase };
 
-        Test.setMock(HttpCalloutMock.class, new GenericCalloutMock());
+        Test.setMock(HttpCalloutMock.class, new TestDataFactory.GenericCalloutMock());
         Test.startTest();
         ChangeRequestHandler.afterUpdate(oldMap, newList);
         Test.stopTest();
@@ -268,7 +274,7 @@ private class TestChangeRequestHandler {
         Map<Id, Case> oldMap = new Map<Id, Case>{ c.Id => oldCase };
         List<Case> newList = new List<Case>{ newCase };
 
-        Test.setMock(HttpCalloutMock.class, new GenericCalloutMock());
+        Test.setMock(HttpCalloutMock.class, new TestDataFactory.GenericCalloutMock());
         Test.startTest();
         ChangeRequestHandler.afterUpdate(oldMap, newList);
         Test.stopTest();
@@ -294,7 +300,7 @@ private class TestChangeRequestHandler {
         Map<Id, Case> oldMap = new Map<Id, Case>{ c.Id => oldCase };
         List<Case> newList = new List<Case>{ newCase };
 
-        Test.setMock(HttpCalloutMock.class, new GenericCalloutMock());
+        Test.setMock(HttpCalloutMock.class, new TestDataFactory.GenericCalloutMock());
         Test.startTest();
         ChangeRequestHandler.afterUpdate(oldMap, newList);
         Test.stopTest();
@@ -320,7 +326,7 @@ private class TestChangeRequestHandler {
         Map<Id, Case> oldMap = new Map<Id, Case>{ c.Id => oldCase };
         List<Case> newList = new List<Case>{ newCase };
 
-        Test.setMock(HttpCalloutMock.class, new GenericCalloutMock());
+        Test.setMock(HttpCalloutMock.class, new TestDataFactory.GenericCalloutMock());
         Test.startTest();
         ChangeRequestHandler.afterUpdate(oldMap, newList);
         Test.stopTest();
@@ -348,7 +354,7 @@ private class TestChangeRequestHandler {
         Map<Id, Case> oldMap = new Map<Id, Case>{ c.Id => oldCase };
         List<Case> newList = new List<Case>{ newCase };
 
-        Test.setMock(HttpCalloutMock.class, new GenericCalloutMock());
+        Test.setMock(HttpCalloutMock.class, new TestDataFactory.GenericCalloutMock());
         Test.startTest();
         ChangeRequestHandler.afterUpdate(oldMap, newList);
         Test.stopTest();
@@ -395,7 +401,7 @@ private class TestChangeRequestHandler {
         Map<Id, Case> oldMap = new Map<Id, Case>{ c.Id => oldCase };
         List<Case> newList = new List<Case>{ newCase };
 
-        Test.setMock(HttpCalloutMock.class, new GenericCalloutMock());
+        Test.setMock(HttpCalloutMock.class, new TestDataFactory.GenericCalloutMock());
         Test.startTest();
         ChangeRequestHandler.afterUpdate(oldMap, newList);
         Test.stopTest();
@@ -420,7 +426,7 @@ private class TestChangeRequestHandler {
         Map<Id, Task> oldMap = new Map<Id, Task>{ t.Id => oldTask };
         List<Task> newList = new List<Task>{ newTask };
 
-        Test.setMock(HttpCalloutMock.class, new GenericCalloutMock());
+        Test.setMock(HttpCalloutMock.class, new TestDataFactory.GenericCalloutMock());
         Test.startTest();
         ChangeRequestHandler.afterTaskUpdate(oldMap, newList);
         Test.stopTest();
@@ -445,7 +451,7 @@ private class TestChangeRequestHandler {
         Map<Id, Task> oldMap = new Map<Id, Task>{ t.Id => oldTask };
         List<Task> newList = new List<Task>{ newTask };
 
-        Test.setMock(HttpCalloutMock.class, new GenericCalloutMock());
+        Test.setMock(HttpCalloutMock.class, new TestDataFactory.GenericCalloutMock());
         Test.startTest();
         ChangeRequestHandler.afterTaskUpdate(oldMap, newList);
         Test.stopTest();
@@ -522,7 +528,7 @@ private class TestChangeRequestHandler {
         Map<Id, Case> oldMap = new Map<Id, Case>{ c.Id => oldCase };
         List<Case> newList = new List<Case>{ newCase };
 
-        Test.setMock(HttpCalloutMock.class, new GenericCalloutMock());
+        Test.setMock(HttpCalloutMock.class, new TestDataFactory.GenericCalloutMock());
         Test.startTest();
         ChangeRequestHandler.afterUpdate(oldMap, newList);
         Test.stopTest();
@@ -567,5 +573,121 @@ private class TestChangeRequestHandler {
 
         System.assertEquals(0, Limits.getQueueableJobs(),
             'No queueable should be enqueued for invalid prefix on Customer_Rec_Id__c');
+    }
+
+    // ════════════════════════════════════════════════════════════════════
+    //  Q. BULK 200 RECORDS — governor limit validation (BP1)
+    // ════════════════════════════════════════════════════════════════════
+
+    @isTest
+    static void test_afterUpdate_bulk200Records_handledGracefully() {
+        Account acc = [SELECT Id FROM Account LIMIT 1];
+        Contact con = [SELECT Id FROM Contact LIMIT 1];
+
+        Id changeRtId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName()
+                            .get('Change_Request').getRecordTypeId();
+
+        // Create 200 Cases in bulk
+        List<Case> bulkCases = new List<Case>();
+        for (Integer i = 0; i < 200; i++) {
+            bulkCases.add(new Case(
+                Subject      = 'Bulk Case ' + i,
+                Status       = 'New',
+                RecordTypeId = changeRtId,
+                AccountId    = acc.Id,
+                ContactId    = con.Id,
+                Origin       = 'Phone',
+                Priority     = 'Medium'
+            ));
+        }
+        insert bulkCases;
+
+        // Re-query to get populated Ids
+        bulkCases = [SELECT Id, Subject, Status, Priority, RecordTypeId,
+                            AccountId, ContactId, Origin, Customer_Rec_Id__c,
+                            Technical_Approved__c, Status_Reason__c
+                     FROM Case WHERE Subject LIKE 'Bulk Case %'];
+
+        // Build old/new maps where every Case has a status change
+        Map<Id, Case> oldMap = new Map<Id, Case>();
+        List<Case> newList = new List<Case>();
+        for (Case c : bulkCases) {
+            Case oldClone = c.clone(true, true);
+            Case newClone = c.clone(true, true);
+            newClone.Status = 'In Progress';
+            oldMap.put(c.Id, oldClone);
+            newList.add(newClone);
+        }
+
+        Test.setMock(HttpCalloutMock.class, new TestDataFactory.GenericCalloutMock());
+        Test.startTest();
+        ChangeRequestHandler.afterUpdate(oldMap, newList);
+        Test.stopTest();
+
+        // In test context only 1 queueable slot is available
+        System.assertEquals(1, Limits.getQueueableJobs(),
+            'Exactly 1 queueable should be enqueued in test context for 200 records');
+
+        // No QueueableLimitExceeded log for the status dispatch itself:
+        // The handler collects ALL 200 into statusUpdateCases, but enqueues
+        // them as a single queueable (not one-per-record). So the slot
+        // is consumed by that single enqueue. No fallback log is expected
+        // for the status path when there is only one dispatch category.
+    }
+
+    // ════════════════════════════════════════════════════════════════════
+    //  R. syncFeedItemsForCases — empty Set returns early (BP2-1)
+    // ════════════════════════════════════════════════════════════════════
+
+    @isTest
+    static void test_syncFeedItemsForCases_emptySet_returnsEarly() {
+        Test.startTest();
+        ChangeRequestHandler.syncFeedItemsForCases(new Set<Id>(), 'TestContext');
+        Test.stopTest();
+
+        System.assertEquals(0, Limits.getQueueableJobs(),
+            'No queueable jobs should be enqueued for an empty Case Id set');
+
+        List<API_Response__c> logs = [
+            SELECT Id FROM API_Response__c
+            WHERE Code__c = 'QueueableLimitExceeded'
+        ];
+        System.assertEquals(0, logs.size(),
+            'No API_Response__c logs should be created for an empty set');
+    }
+
+    // ════════════════════════════════════════════════════════════════════
+    //  S. syncFeedItemsForCases — no matching FeedItems (BP2-2)
+    // ════════════════════════════════════════════════════════════════════
+
+    @isTest
+    static void test_syncFeedItemsForCases_noMatchingFeedItems_returnsEarly() {
+        Case noFeedCase = getCaseBySubject('No FeedItem Case');
+
+        Test.startTest();
+        ChangeRequestHandler.syncFeedItemsForCases(
+            new Set<Id>{ noFeedCase.Id }, 'TestContext');
+        Test.stopTest();
+
+        System.assertEquals(0, Limits.getQueueableJobs(),
+            'No queueable jobs should be enqueued when no FeedItems exist for the Case');
+    }
+
+    // ════════════════════════════════════════════════════════════════════
+    //  T. syncFeedItemsForCases — with FeedItems enqueues job (BP2-3)
+    // ════════════════════════════════════════════════════════════════════
+
+    @isTest
+    static void test_syncFeedItemsForCases_withFeedItems_enqueuesJob() {
+        Case feedCase = getCaseBySubject('FeedItem BackSync Case');
+
+        Test.setMock(HttpCalloutMock.class, new TestDataFactory.GenericCalloutMock());
+        Test.startTest();
+        ChangeRequestHandler.syncFeedItemsForCases(
+            new Set<Id>{ feedCase.Id }, 'TestContext');
+        Test.stopTest();
+
+        System.assertEquals(1, Limits.getQueueableJobs(),
+            'One queueable job should be enqueued for FeedItem sync');
     }
 }

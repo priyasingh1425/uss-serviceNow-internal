@@ -111,6 +111,8 @@ private class TestTriggerBypass {
     // ════════════════════════════════════════════════════════════════════
 
     @isTest
+    // WARNING: null bypass state will cause NullPointerException on Boolean unboxing
+    // in downstream code. Source class should coalesce null to false.
     static void test_setBypassFeedItemTrigger_nullValue_assignsNull() {
         // In Apex, a Boolean variable can hold null. Passing null to the
         // setter should not throw a NullPointerException; it simply stores
@@ -125,6 +127,8 @@ private class TestTriggerBypass {
     }
 
     @isTest
+    // WARNING: null bypass state will cause NullPointerException on Boolean unboxing
+    // in downstream code. Source class should coalesce null to false.
     static void test_setBypassChangeRequestHandler_nullValue_assignsNull() {
         Test.startTest();
         TriggerBypass.setBypassChangeRequestHandler(null);

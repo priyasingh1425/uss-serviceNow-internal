@@ -10,6 +10,13 @@
  *
  * Observability gap: ErrorMessageBuilder does not log to any persistent
  * object or System.debug — expected by design for a pure formatting utility.
+ *
+ * @risk  R4 — Several tests use JSON.deserialize(errorJson, Database.Error.class)
+ *        to fabricate Database.Error instances with specific StatusCodes.
+ *        This is an undocumented Salesforce technique. If a future API version
+ *        changes the internal structure of Database.Error, these tests may
+ *        break. Test B (real DML fallback) provides a safety net for the
+ *        REQUIRED_FIELD_MISSING branch using authentic DML failures.
  */
 @isTest
 private class TestErrorMessageBuilder {
