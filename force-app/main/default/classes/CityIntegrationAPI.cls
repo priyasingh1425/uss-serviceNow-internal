@@ -389,9 +389,11 @@ global with sharing class CityIntegrationAPI {
                 c.Case_Classification__c = 'Configuration';
                 if(payload.ScheduledStartDate != null){
                     c.Planned_Start_Date__c = DateTime.valueOf(payload.ScheduledStartDate);
+                    c.Authorized_Start_Date__c = c.Planned_Start_Date__c;
                 }
                 if(payload.ScheduledEndDate != null){
                     c.Planned_Delivery_Date__c = DateTime.valueOf(payload.ScheduledEndDate);
+                    c.Authorized_End_Date__c = c.Planned_Delivery_Date__c;
                 }
                 if(payload.Priority != null){
                     c.Priority_Number__c = parsePriorityNumber(payload.Priority);
@@ -460,9 +462,11 @@ global with sharing class CityIntegrationAPI {
                     }
                     if(taskPayload.ScheduledStartDate != null){
                         ct.Planned_Start_Date__c = DateTime.valueOf(taskPayload.ScheduledStartDate);
+                        ct.Authorized_Start_Date__c = ct.Planned_Start_Date__c;
                     }
                     if(taskPayload.ScheduledEndDate != null){
                         ct.Planned_Delivery_Date__c = DateTime.valueOf(taskPayload.ScheduledEndDate);
+                        ct.Authorized_End_Date__c = ct.Planned_Delivery_Date__c;
                     }
                     ct.AccountId = accId;
                     ct.ContactId = conId;
