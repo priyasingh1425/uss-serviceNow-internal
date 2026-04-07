@@ -20,7 +20,8 @@ public with sharing class ChangeRequestHandler {
             }
             Case oldCase = oldCases.get(newCase.Id);
 
-            if (hasStatusChanged(oldCase, newCase) || isParkedWaitingForCustomer(oldCase, newCase) || hasTechnicalApprovalChanged(oldCase, newCase)) {
+            if (newCase.AccountId == CityIntegrationConstants.ACCOUNT_ID
+                && (hasStatusChanged(oldCase, newCase) || isParkedWaitingForCustomer(oldCase, newCase) || hasTechnicalApprovalChanged(oldCase, newCase))) {
                 statusUpdateCases.add(newCase);
             }
 
@@ -119,11 +120,12 @@ public with sharing class ChangeRequestHandler {
     }
 
     private static Boolean hasStatusChanged(Case oldCase, Case newCase) {
-        return oldCase.Status != newCase.Status;
+        return oldCase.Status != newCase.Status && newCase.Status != CityIntegrationConstants.STATUS_CLOSED;
     }
 
     private static Boolean hasPriorityChanged(Case oldCase, Case newCase) {
-        return oldCase.Priority != newCase.Priority;
+        return oldCase.Priority != newCase.Priority
+            && newCase.AccountId == CityIntegrationConstants.ACCOUNT_ID;
     }
 
     private static Boolean isParkedWaitingForCustomer(Case oldCase, Case newCase) {

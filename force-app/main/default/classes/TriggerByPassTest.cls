@@ -1,18 +1,5 @@
-/**
- * @description  Enterprise-standard test class for TriggerBypass.
- *               Validates default initialization states, setter/getter
- *               toggle behaviour, null-safety, and independence of the
- *               two bypass flags (FeedItem trigger and ChangeRequest handler).
- *
- * Observability gap: TriggerBypass is a micro-utility class that does not
- * log to any persistent object or System.debug — expected by design.
- */
 @isTest
-private class TestTriggerBypass {
-
-    // ════════════════════════════════════════════════════════════════════
-    //  A. DEFAULT STATE — FeedItem Trigger
-    // ════════════════════════════════════════════════════════════════════
+private class TriggerByPassTest {
 
     @isTest
     static void test_isFeedItemTriggerBypassed_defaultState_returnsFalse() {
@@ -24,10 +11,6 @@ private class TestTriggerBypass {
             'FeedItem trigger bypass should default to false before any setter is called');
     }
 
-    // ════════════════════════════════════════════════════════════════════
-    //  B. SET TRUE — FeedItem Trigger
-    // ════════════════════════════════════════════════════════════════════
-
     @isTest
     static void test_setBypassFeedItemTrigger_true_getterReturnsTrue() {
         Test.startTest();
@@ -38,10 +21,6 @@ private class TestTriggerBypass {
         System.assertEquals(true, result,
             'FeedItem trigger bypass should return true after being set to true');
     }
-
-    // ════════════════════════════════════════════════════════════════════
-    //  C. SET FALSE (toggle back) — FeedItem Trigger
-    // ════════════════════════════════════════════════════════════════════
 
     @isTest
     static void test_setBypassFeedItemTrigger_toggleBackToFalse_getterReturnsFalse() {
@@ -58,10 +37,6 @@ private class TestTriggerBypass {
             'FeedItem trigger bypass should return false after being toggled back to false');
     }
 
-    // ════════════════════════════════════════════════════════════════════
-    //  D. DEFAULT STATE — ChangeRequest Handler
-    // ════════════════════════════════════════════════════════════════════
-
     @isTest
     static void test_isChangeRequestHandlerBypassed_defaultState_returnsFalse() {
         Test.startTest();
@@ -71,10 +46,6 @@ private class TestTriggerBypass {
         System.assertEquals(false, result,
             'ChangeRequest handler bypass should default to false before any setter is called');
     }
-
-    // ════════════════════════════════════════════════════════════════════
-    //  E. SET TRUE — ChangeRequest Handler
-    // ════════════════════════════════════════════════════════════════════
 
     @isTest
     static void test_setBypassChangeRequestHandler_true_getterReturnsTrue() {
@@ -86,10 +57,6 @@ private class TestTriggerBypass {
         System.assertEquals(true, result,
             'ChangeRequest handler bypass should return true after being set to true');
     }
-
-    // ════════════════════════════════════════════════════════════════════
-    //  F. SET FALSE (toggle back) — ChangeRequest Handler
-    // ════════════════════════════════════════════════════════════════════
 
     @isTest
     static void test_setBypassChangeRequestHandler_toggleBackToFalse_getterReturnsFalse() {
@@ -106,17 +73,8 @@ private class TestTriggerBypass {
             'ChangeRequest handler bypass should return false after being toggled back to false');
     }
 
-    // ════════════════════════════════════════════════════════════════════
-    //  G. EDGE CASE — null value passed to setters
-    // ════════════════════════════════════════════════════════════════════
-
     @isTest
-    // WARNING: null bypass state will cause NullPointerException on Boolean unboxing
-    // in downstream code. Source class should coalesce null to false.
     static void test_setBypassFeedItemTrigger_nullValue_assignsNull() {
-        // In Apex, a Boolean variable can hold null. Passing null to the
-        // setter should not throw a NullPointerException; it simply stores
-        // null in the static variable. The getter then returns null.
         Test.startTest();
         TriggerBypass.setBypassFeedItemTrigger(null);
         Boolean result = TriggerBypass.isFeedItemTriggerBypassed();
@@ -127,8 +85,6 @@ private class TestTriggerBypass {
     }
 
     @isTest
-    // WARNING: null bypass state will cause NullPointerException on Boolean unboxing
-    // in downstream code. Source class should coalesce null to false.
     static void test_setBypassChangeRequestHandler_nullValue_assignsNull() {
         Test.startTest();
         TriggerBypass.setBypassChangeRequestHandler(null);
@@ -138,10 +94,6 @@ private class TestTriggerBypass {
         System.assertEquals(null, result,
             'ChangeRequest handler bypass should hold null when null is explicitly passed to the setter');
     }
-
-    // ════════════════════════════════════════════════════════════════════
-    //  H. INDEPENDENCE — toggling one flag does not affect the other
-    // ════════════════════════════════════════════════════════════════════
 
     @isTest
     static void test_bypassFlags_areIndependent_feedItemDoesNotAffectChangeRequest() {
@@ -179,7 +131,6 @@ private class TestTriggerBypass {
         System.assertEquals(true, TriggerBypass.isChangeRequestHandlerBypassed(),
             'ChangeRequest bypass should be true');
 
-        // Now toggle only one off
         TriggerBypass.setBypassFeedItemTrigger(false);
 
         System.assertEquals(false, TriggerBypass.isFeedItemTriggerBypassed(),

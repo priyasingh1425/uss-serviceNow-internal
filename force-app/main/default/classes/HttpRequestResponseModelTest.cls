@@ -1,20 +1,5 @@
-/**
- * @description  Enterprise-standard test class for HttpRequestResponseModel.
- *               Validates all 11 inner DTO classes (8 request models, 3 response
- *               primitives) via property assignment, and rigorously tests the
- *               3 logic methods on CRCreateResponse: isSuccess(), isFailure(),
- *               and getResolvedMessage() across all branches. Includes JSON
- *               deserialization tests for real-world response parsing fidelity.
- *
- * Observability gap: HttpRequestResponseModel is a pure DTO/schema class
- * with no logging, DML, SOQL, or callout behavior — expected by design.
- */
 @isTest
-private class TestHttpRequestResponseModel {
-
-    // ════════════════════════════════════════════════════════════════════
-    //  A. CRCreateRequest — property coverage
-    // ════════════════════════════════════════════════════════════════════
+private class HttpRequestResponseModelTest {
 
     @isTest
     static void test_CRCreateRequest_properties_coverage() {
@@ -56,10 +41,6 @@ private class TestHttpRequestResponseModel {
             'backout_plan should match assigned value');
     }
 
-    // ════════════════════════════════════════════════════════════════════
-    //  B. CreateWorknoteRequest — property coverage
-    // ════════════════════════════════════════════════════════════════════
-
     @isTest
     static void test_CreateWorknoteRequest_properties_coverage() {
         Test.startTest();
@@ -70,10 +51,6 @@ private class TestHttpRequestResponseModel {
         System.assertEquals('This is a work note entry', req.Worknote,
             'Worknote should match assigned value');
     }
-
-    // ════════════════════════════════════════════════════════════════════
-    //  C. CloseCRRequest — property coverage
-    // ════════════════════════════════════════════════════════════════════
 
     @isTest
     static void test_CloseCRRequest_properties_coverage() {
@@ -95,10 +72,6 @@ private class TestHttpRequestResponseModel {
             'state should match assigned integer value');
     }
 
-    // ════════════════════════════════════════════════════════════════════
-    //  D. UpdateTaskStatusRequest — property coverage
-    // ════════════════════════════════════════════════════════════════════
-
     @isTest
     static void test_UpdateTaskStatusRequest_properties_coverage() {
         Test.startTest();
@@ -112,10 +85,6 @@ private class TestHttpRequestResponseModel {
         System.assertEquals('completed', req.status,
             'status should match assigned value');
     }
-
-    // ════════════════════════════════════════════════════════════════════
-    //  E. CreateIncidents — property coverage
-    // ════════════════════════════════════════════════════════════════════
 
     @isTest
     static void test_CreateIncidents_properties_coverage() {
@@ -143,10 +112,6 @@ private class TestHttpRequestResponseModel {
             'u_category should match assigned value');
     }
 
-    // ════════════════════════════════════════════════════════════════════
-    //  F. ResolveIncident — property coverage
-    // ════════════════════════════════════════════════════════════════════
-
     @isTest
     static void test_ResolveIncident_properties_coverage() {
         Test.startTest();
@@ -157,10 +122,6 @@ private class TestHttpRequestResponseModel {
         System.assertEquals('Root cause identified and resolved', req.CloseNote,
             'CloseNote should match assigned value');
     }
-
-    // ════════════════════════════════════════════════════════════════════
-    //  G. UpdateIncidentStatus — property coverage
-    // ════════════════════════════════════════════════════════════════════
 
     @isTest
     static void test_UpdateIncidentStatus_properties_coverage() {
@@ -173,10 +134,6 @@ private class TestHttpRequestResponseModel {
             'status should match assigned value');
     }
 
-    // ════════════════════════════════════════════════════════════════════
-    //  H. UpdateIncidentPriority — property coverage
-    // ════════════════════════════════════════════════════════════════════
-
     @isTest
     static void test_UpdateIncidentPriority_properties_coverage() {
         Test.startTest();
@@ -187,10 +144,6 @@ private class TestHttpRequestResponseModel {
         System.assertEquals('2', req.u_priority,
             'u_priority should match assigned value');
     }
-
-    // ════════════════════════════════════════════════════════════════════
-    //  I. Result, ErrorInfo, ErrorDetails — property coverage
-    // ════════════════════════════════════════════════════════════════════
 
     @isTest
     static void test_Result_ErrorInfo_ErrorDetails_properties_coverage() {
@@ -221,10 +174,6 @@ private class TestHttpRequestResponseModel {
             'ErrorDetails.error should reference the ErrorInfo instance');
     }
 
-    // ════════════════════════════════════════════════════════════════════
-    //  J. CRCreateResponse — isSuccess() returns true
-    // ════════════════════════════════════════════════════════════════════
-
     @isTest
     static void test_CRCreateResponse_isSuccess_true() {
         HttpRequestResponseModel.CRCreateResponse resp = new HttpRequestResponseModel.CRCreateResponse();
@@ -239,14 +188,9 @@ private class TestHttpRequestResponseModel {
             'isSuccess() should return true when result is not null');
     }
 
-    // ════════════════════════════════════════════════════════════════════
-    //  K. CRCreateResponse — isSuccess() returns false
-    // ════════════════════════════════════════════════════════════════════
-
     @isTest
     static void test_CRCreateResponse_isSuccess_false() {
         HttpRequestResponseModel.CRCreateResponse resp = new HttpRequestResponseModel.CRCreateResponse();
-        // result is null by default
 
         Test.startTest();
         Boolean success = resp.isSuccess();
@@ -255,10 +199,6 @@ private class TestHttpRequestResponseModel {
         System.assertEquals(false, success,
             'isSuccess() should return false when result is null');
     }
-
-    // ════════════════════════════════════════════════════════════════════
-    //  L. CRCreateResponse — isFailure() returns true
-    // ════════════════════════════════════════════════════════════════════
 
     @isTest
     static void test_CRCreateResponse_isFailure_true() {
@@ -274,14 +214,9 @@ private class TestHttpRequestResponseModel {
             'isFailure() should return true when Details.status is "failure"');
     }
 
-    // ════════════════════════════════════════════════════════════════════
-    //  M. CRCreateResponse — isFailure() returns false (null Details)
-    // ════════════════════════════════════════════════════════════════════
-
     @isTest
     static void test_CRCreateResponse_isFailure_false_nullDetails() {
         HttpRequestResponseModel.CRCreateResponse resp = new HttpRequestResponseModel.CRCreateResponse();
-        // Details is null by default
 
         Test.startTest();
         Boolean failure = resp.isFailure();
@@ -290,10 +225,6 @@ private class TestHttpRequestResponseModel {
         System.assertEquals(false, failure,
             'isFailure() should return false when Details is null');
     }
-
-    // ════════════════════════════════════════════════════════════════════
-    //  N. CRCreateResponse — isFailure() returns false (non-failure status)
-    // ════════════════════════════════════════════════════════════════════
 
     @isTest
     static void test_CRCreateResponse_isFailure_false_differentStatus() {
@@ -309,10 +240,6 @@ private class TestHttpRequestResponseModel {
             'isFailure() should return false when Details.status is not "failure"');
     }
 
-    // ════════════════════════════════════════════════════════════════════
-    //  O. getResolvedMessage — SUCCESS branch (result.response)
-    // ════════════════════════════════════════════════════════════════════
-
     @isTest
     static void test_CRCreateResponse_getResolvedMessage_successBranch() {
         HttpRequestResponseModel.CRCreateResponse resp = new HttpRequestResponseModel.CRCreateResponse();
@@ -327,11 +254,6 @@ private class TestHttpRequestResponseModel {
             'getResolvedMessage should return result.response on the success branch');
     }
 
-    // ════════════════════════════════════════════════════════════════════
-    //  P. getResolvedMessage — SUCCESS with null result.response
-    //     (falls through to error/fallback branch)
-    // ════════════════════════════════════════════════════════════════════
-
     @isTest
     static void test_CRCreateResponse_getResolvedMessage_successNullResponse() {
         HttpRequestResponseModel.CRCreateResponse resp = new HttpRequestResponseModel.CRCreateResponse();
@@ -343,16 +265,9 @@ private class TestHttpRequestResponseModel {
         String msg = resp.getResolvedMessage();
         Test.stopTest();
 
-        // isSuccess() is true (result != null), but result.response is null,
-        // so the first if-block is skipped. Details is null => skips second if.
-        // Falls through to return Description.
         System.assertEquals('Fallback desc', msg,
             'getResolvedMessage should fall to Description when result.response is null');
     }
-
-    // ════════════════════════════════════════════════════════════════════
-    //  Q. getResolvedMessage — ERROR branch (Details.error.message)
-    // ════════════════════════════════════════════════════════════════════
 
     @isTest
     static void test_CRCreateResponse_getResolvedMessage_errorBranch() {
@@ -370,15 +285,10 @@ private class TestHttpRequestResponseModel {
             'getResolvedMessage should return Details.error.message on the error branch');
     }
 
-    // ════════════════════════════════════════════════════════════════════
-    //  R. getResolvedMessage — FALLBACK branch (Description)
-    // ════════════════════════════════════════════════════════════════════
-
     @isTest
     static void test_CRCreateResponse_getResolvedMessage_fallbackBranch() {
         HttpRequestResponseModel.CRCreateResponse resp = new HttpRequestResponseModel.CRCreateResponse();
         resp.Description = 'Generic error description';
-        // result is null, Details is null
 
         Test.startTest();
         String msg = resp.getResolvedMessage();
@@ -388,14 +298,9 @@ private class TestHttpRequestResponseModel {
             'getResolvedMessage should return Description as the final fallback');
     }
 
-    // ════════════════════════════════════════════════════════════════════
-    //  S. getResolvedMessage — all null (returns null)
-    // ════════════════════════════════════════════════════════════════════
-
     @isTest
     static void test_CRCreateResponse_getResolvedMessage_allNull() {
         HttpRequestResponseModel.CRCreateResponse resp = new HttpRequestResponseModel.CRCreateResponse();
-        // Everything is null
 
         Test.startTest();
         String msg = resp.getResolvedMessage();
@@ -405,19 +310,15 @@ private class TestHttpRequestResponseModel {
             'getResolvedMessage should return null when all properties are null');
     }
 
-    // ════════════════════════════════════════════════════════════════════
-    //  T. JSON DESERIALIZATION — success response layout
-    // ════════════════════════════════════════════════════════════════════
-
     @isTest
     static void test_CRCreateResponse_jsonDeserialization_successLayout() {
-        String json = '{"status":"success","message":"OK","crNumber":"CHG0012345",'
+        String jsonPayload = '{"status":"success","message":"OK","crNumber":"CHG0012345",'
             + '"result":{"response":"CHG0012345"}}';
 
         Test.startTest();
         HttpRequestResponseModel.CRCreateResponse resp =
             (HttpRequestResponseModel.CRCreateResponse) JSON.deserialize(
-                json, HttpRequestResponseModel.CRCreateResponse.class
+                jsonPayload, HttpRequestResponseModel.CRCreateResponse.class
             );
         Test.stopTest();
 
@@ -433,19 +334,15 @@ private class TestHttpRequestResponseModel {
             'getResolvedMessage() should return the result.response value');
     }
 
-    // ════════════════════════════════════════════════════════════════════
-    //  U. JSON DESERIALIZATION — error response layout
-    // ════════════════════════════════════════════════════════════════════
-
     @isTest
     static void test_CRCreateResponse_jsonDeserialization_errorLayout() {
-        String json = '{"Details":{"status":"failure","error":{"message":"Not Found","detail":"Record does not exist"}},'
+        String jsonPayload = '{"Details":{"status":"failure","error":{"message":"Not Found","detail":"Record does not exist"}},'
             + '"Description":"Record lookup failed"}';
 
         Test.startTest();
         HttpRequestResponseModel.CRCreateResponse resp =
             (HttpRequestResponseModel.CRCreateResponse) JSON.deserialize(
-                json, HttpRequestResponseModel.CRCreateResponse.class
+                jsonPayload, HttpRequestResponseModel.CRCreateResponse.class
             );
         Test.stopTest();
 
@@ -457,17 +354,13 @@ private class TestHttpRequestResponseModel {
             'getResolvedMessage() should return the error message from Details');
     }
 
-    // ════════════════════════════════════════════════════════════════════
-    //  V. OUTER CLASS — instantiation for coverage
-    // ════════════════════════════════════════════════════════════════════
-
     @isTest
     static void test_outerClass_canBeInstantiated() {
         Test.startTest();
-        HttpRequestResponseModel outer = new HttpRequestResponseModel();
+        HttpRequestResponseModel outerInstance = new HttpRequestResponseModel();
         Test.stopTest();
 
-        System.assertNotEquals(null, outer,
+        System.assertNotEquals(null, outerInstance,
             'Outer HttpRequestResponseModel class should be instantiable');
     }
 }

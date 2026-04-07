@@ -1,22 +1,5 @@
-/**
- * @description  Enterprise-standard test class for MPLResponse.
- *               Validates all static factory methods, branching logic inside
- *               the overloaded success() method, the error() method, edge
- *               cases with null inputs, and field-level correctness of the
- *               constructed response wrapper.
- *
- * Observability gap: MPLResponse does not log to any persistent object or
- * System.debug — expected by design for a pure DTO/wrapper class.
- *
- * Testability: Excellent. No SOQL, DML, callouts, or sharing concerns.
- *              All methods are stateless static factories returning new instances.
- */
 @isTest
-private class TestMPLResponse {
-
-    // ════════════════════════════════════════════════════════════════════
-    //  A. POSITIVE SCENARIOS — incidentSuccess
-    // ════════════════════════════════════════════════════════════════════
+private class MPLResponseTest {
 
     @isTest
     static void test_incidentSuccess_validInputs_constructsProperly() {
@@ -47,10 +30,6 @@ private class TestMPLResponse {
         System.assertEquals(null, result.LogID,
             'LogID should be null by design');
     }
-
-    // ════════════════════════════════════════════════════════════════════
-    //  B. POSITIVE SCENARIOS — success (two-parameter overload)
-    // ════════════════════════════════════════════════════════════════════
 
     @isTest
     static void test_success_twoParams_constructsProperly() {
@@ -83,10 +62,6 @@ private class TestMPLResponse {
             'JournalNoteRecID should remain null for the two-param success overload');
     }
 
-    // ════════════════════════════════════════════════════════════════════
-    //  C. POSITIVE SCENARIOS — success (three-parameter, CHANGE type)
-    // ════════════════════════════════════════════════════════════════════
-
     @isTest
     static void test_success_threeParams_typeChange_assignsChangeIds() {
         String msg = 'Change request created';
@@ -114,10 +89,6 @@ private class TestMPLResponse {
             'IncidentRecID should remain null when responseType is CHANGE');
     }
 
-    // ════════════════════════════════════════════════════════════════════
-    //  D. POSITIVE SCENARIOS — success (three-parameter, WORKNOTE type)
-    // ════════════════════════════════════════════════════════════════════
-
     @isTest
     static void test_success_threeParams_typeWorknote_assignsJournalNote() {
         String msg = 'Notes created successfully';
@@ -140,10 +111,6 @@ private class TestMPLResponse {
         System.assertEquals(null, result.ChangeRecID,
             'ChangeRecID should remain null when responseType is WORKNOTE');
     }
-
-    // ════════════════════════════════════════════════════════════════════
-    //  E. POSITIVE SCENARIOS — successChange
-    // ════════════════════════════════════════════════════════════════════
 
     @isTest
     static void test_successChange_validInputs_constructsProperly() {
@@ -175,10 +142,6 @@ private class TestMPLResponse {
             'LogID should be null by design');
     }
 
-    // ════════════════════════════════════════════════════════════════════
-    //  F. NEGATIVE SCENARIOS — error
-    // ════════════════════════════════════════════════════════════════════
-
     @isTest
     static void test_error_constructsErrorPayload() {
         String msg = 'Missing action parameter';
@@ -209,10 +172,6 @@ private class TestMPLResponse {
             'LogID should be null for error responses');
     }
 
-    // ════════════════════════════════════════════════════════════════════
-    //  G. BRANCH COVERAGE — unknown responseType (default path)
-    // ════════════════════════════════════════════════════════════════════
-
     @isTest
     static void test_success_threeParams_unknownType_ignoresSpecialBinding() {
         String msg = 'Generic success';
@@ -237,10 +196,6 @@ private class TestMPLResponse {
         System.assertEquals(null, result.IncidentID,
             'IncidentID should remain null for unknown responseType (three-param overload does not set it)');
     }
-
-    // ════════════════════════════════════════════════════════════════════
-    //  H. EDGE CASES — null inputs
-    // ════════════════════════════════════════════════════════════════════
 
     @isTest
     static void test_incidentSuccess_nullInputs_handlesGracefully() {
@@ -330,10 +285,6 @@ private class TestMPLResponse {
             'message should be null when null is passed to error()');
     }
 
-    // ════════════════════════════════════════════════════════════════════
-    //  I. EDGE CASES — empty string inputs
-    // ════════════════════════════════════════════════════════════════════
-
     @isTest
     static void test_incidentSuccess_emptyStrings_handlesGracefully() {
         Test.startTest();
@@ -364,10 +315,6 @@ private class TestMPLResponse {
             'message should be empty string when empty string is passed');
     }
 
-    // ════════════════════════════════════════════════════════════════════
-    //  J. IDEMPOTENCY — repeated calls produce independent instances
-    // ════════════════════════════════════════════════════════════════════
-
     @isTest
     static void test_multipleCalls_returnIndependentInstances() {
         Test.startTest();
@@ -387,10 +334,6 @@ private class TestMPLResponse {
         System.assert(r2 !== r3,
             'Error and success calls should return distinct instances');
     }
-
-    // ════════════════════════════════════════════════════════════════════
-    //  K. SPECIAL CHARACTERS — message with special characters
-    // ════════════════════════════════════════════════════════════════════
 
     @isTest
     static void test_error_specialCharactersInMessage_handlesGracefully() {

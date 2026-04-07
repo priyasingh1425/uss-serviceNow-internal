@@ -1,29 +1,5 @@
-/**
- * @description  Enterprise-standard test class for ErrorMessageBuilder.
- *               Validates every branch in the build() method: null input,
- *               all five named StatusCode paths, the fields-present fallback,
- *               and the final catch-all fallback.
- *
- *               Uses real DML failures via Database.insert(record, false)
- *               to generate authentic Database.Error objects for deterministic
- *               branch coverage.
- *
- * Observability gap: ErrorMessageBuilder does not log to any persistent
- * object or System.debug — expected by design for a pure formatting utility.
- *
- * @risk  R4 — Several tests use JSON.deserialize(errorJson, Database.Error.class)
- *        to fabricate Database.Error instances with specific StatusCodes.
- *        This is an undocumented Salesforce technique. If a future API version
- *        changes the internal structure of Database.Error, these tests may
- *        break. Test B (real DML fallback) provides a safety net for the
- *        REQUIRED_FIELD_MISSING branch using authentic DML failures.
- */
 @isTest
-private class TestErrorMessageBuilder {
-
-    // ════════════════════════════════════════════════════════════════════
-    //  A. NULL INPUT — Branch 1
-    // ════════════════════════════════════════════════════════════════════
+private class ErrorMessageBuilderTest {
 
     @isTest
     static void test_build_nullError_returnsGenericMessage() {
@@ -38,21 +14,14 @@ private class TestErrorMessageBuilder {
         );
     }
 
-    // ════════════════════════════════════════════════════════════════════
-    //  B. REQUIRED_FIELD_MISSING — Branch 2
-    // ════════════════════════════════════════════════════════════════════
-
     @isTest
     static void test_build_requiredFieldMissing_returnsFieldList() {
-        // Insert a Case without a required lookup to force REQUIRED_FIELD_MISSING.
-        // We create a bare Account with Name missing (Name is required on Account).
-        Account acc = new Account(); // Name is required
+        Account acc = new Account();
         Database.SaveResult sr = Database.insert(acc, false);
 
         if (!sr.isSuccess()) {
             Database.Error err = sr.getErrors()[0];
 
-            // If the specific error happens to be REQUIRED_FIELD_MISSING, test that branch
             if (err.getStatusCode() == StatusCode.REQUIRED_FIELD_MISSING) {
                 Test.startTest();
                 String result = ErrorMessageBuilder.build(err);
@@ -66,10 +35,7 @@ private class TestErrorMessageBuilder {
             }
         }
 
-        // Fallback: manually verify the method handles this StatusCode via
-        // a DML error from a different object approach.
-        // Insert a Contact without LastName (required).
-        Contact con = new Contact(); // LastName is required
+        Contact con = new Contact();
         Database.SaveResult sr2 = Database.insert(con, false);
 
         System.assert(!sr2.isSuccess(),
@@ -85,24 +51,8 @@ private class TestErrorMessageBuilder {
             'build() should return a non-empty message for a DML error');
     }
 
-    // ════════════════════════════════════════════════════════════════════
-    //  C. DUPLICATE_VALUE — Branch 3
-    // ════════════════════════════════════════════════════════════════════
-
     @isTest
     static void test_build_duplicateValue_returnsFormattedMessage() {
-        // Create two Accounts with the same unique external Id to force DUPLICATE_VALUE.
-        // First, create an Account.
-        Account acc1 = new Account(Name = 'Dup Test 1');
-        insert acc1;
-
-        // Now attempt to insert a second Account that references the same Id
-        // via a unique field. We leverage the native Id field uniqueness by
-        // attempting an upsert scenario, or we directly test the error handling path.
-
-        // Alternative: We use a Group with same DeveloperName to force dupe,
-        // but Group creation is restricted. Instead, let's fabricate the
-        // Database.Error via JSON deserialization (officially supported technique).
         String errorJson = '{"statusCode":"DUPLICATE_VALUE","message":"duplicate value found","fields":[]}';
         Database.Error err = (Database.Error) JSON.deserialize(errorJson, Database.Error.class);
 
@@ -116,10 +66,6 @@ private class TestErrorMessageBuilder {
             'DUPLICATE_VALUE should return the duplicate record message'
         );
     }
-
-    // ════════════════════════════════════════════════════════════════════
-    //  D. UNABLE_TO_LOCK_ROW — Branch 4
-    // ════════════════════════════════════════════════════════════════════
 
     @isTest
     static void test_build_unableToLockRow_returnsFormattedMessage() {
@@ -137,10 +83,6 @@ private class TestErrorMessageBuilder {
         );
     }
 
-    // ════════════════════════════════════════════════════════════════════
-    //  E. INSUFFICIENT_ACCESS_OR_READONLY — Branch 5
-    // ════════════════════════════════════════════════════════════════════
-
     @isTest
     static void test_build_insufficientAccess_returnsFormattedMessage() {
         String errorJson = '{"statusCode":"INSUFFICIENT_ACCESS_OR_READONLY","message":"insufficient access rights","fields":[]}';
@@ -157,10 +99,6 @@ private class TestErrorMessageBuilder {
         );
     }
 
-    // ════════════════════════════════════════════════════════════════════
-    //  F. FIELD_CUSTOM_VALIDATION_EXCEPTION — Branch 6
-    // ════════════════════════════════════════════════════════════════════
-
     @isTest
     static void test_build_customValidation_returnsFormattedMessage() {
         String errorJson = '{"statusCode":"FIELD_CUSTOM_VALIDATION_EXCEPTION","message":"Amount must be greater than zero","fields":["Amount"]}';
@@ -175,10 +113,6 @@ private class TestErrorMessageBuilder {
         System.assert(result.contains('Amount must be greater than zero'),
             'Message should contain the original validation error message');
     }
-
-    // ════════════════════════════════════════════════════════════════════
-    //  G. FALLBACK 1 — Unknown status code WITH fields present
-    // ════════════════════════════════════════════════════════════════════
 
     @isTest
     static void test_build_unknownStatusWithFields_returnsFieldsFallback() {
@@ -199,10 +133,6 @@ private class TestErrorMessageBuilder {
             'Message should include the detail from err.getMessage()');
     }
 
-    // ════════════════════════════════════════════════════════════════════
-    //  H. FALLBACK 2 — Unknown status code WITHOUT fields (catch-all)
-    // ════════════════════════════════════════════════════════════════════
-
     @isTest
     static void test_build_unknownStatusNoFields_returnsCatchAll() {
         String errorJson = '{"statusCode":"UNKNOWN_EXCEPTION","message":"Something went wrong internally.","fields":[]}';
@@ -218,13 +148,8 @@ private class TestErrorMessageBuilder {
             'Catch-all message should include the original error message');
     }
 
-    // ════════════════════════════════════════════════════════════════════
-    //  I. REAL DML ERROR — end-to-end validation with actual DML
-    // ════════════════════════════════════════════════════════════════════
-
     @isTest
     static void test_build_realDmlError_returnsNonEmptyMessage() {
-        // Insert a Contact without LastName (a standard required field)
         Contact con = new Contact();
         Database.SaveResult sr = Database.insert(con, false);
 
@@ -243,13 +168,7 @@ private class TestErrorMessageBuilder {
             'build() should never return null for a real DML error');
         System.assert(result.length() > 0,
             'build() should return a non-empty message for a real DML error');
-        // The real error will hit one of the defined branches or the fallback,
-        // but we don't assert which one — the point is end-to-end smoke coverage.
     }
-
-    // ════════════════════════════════════════════════════════════════════
-    //  J. EDGE — REQUIRED_FIELD_MISSING with multiple fields
-    // ════════════════════════════════════════════════════════════════════
 
     @isTest
     static void test_build_requiredFieldMissing_multipleFields_joinsCorrectly() {
@@ -270,10 +189,6 @@ private class TestErrorMessageBuilder {
             'Message should include the third missing field');
     }
 
-    // ════════════════════════════════════════════════════════════════════
-    //  K. EDGE — FIELD_CUSTOM_VALIDATION with empty message
-    // ════════════════════════════════════════════════════════════════════
-
     @isTest
     static void test_build_customValidation_emptyMessage_handlesGracefully() {
         String errorJson = '{"statusCode":"FIELD_CUSTOM_VALIDATION_EXCEPTION","message":"","fields":[]}';
@@ -286,10 +201,6 @@ private class TestErrorMessageBuilder {
         System.assert(result.startsWith('The record does not meet business validation rules:'),
             'Even with an empty message, the prefix should be present');
     }
-
-    // ════════════════════════════════════════════════════════════════════
-    //  L. EDGE — catch-all with special characters in message
-    // ════════════════════════════════════════════════════════════════════
 
     @isTest
     static void test_build_catchAll_specialCharacters_preserved() {
