@@ -50,38 +50,50 @@ public with sharing class ChangeRequestHandler {
         }
 
         if (!caseIdsForNotes.isEmpty()) {
-            List<FeedItem> feedItems = [
-                SELECT Id, ParentId, Body, Visibility, Type
-                FROM FeedItem
-                WHERE ParentId IN :caseIdsForNotes
-                AND Visibility = 'AllUsers'
-                AND Type = 'TextPost'
-                LIMIT 1000
-            ];
+            syncFeedItemsForCases(caseIdsForNotes, 'ChangeRequestHandler afterUpdate');
+        }
+    }
 
-            Integer remainingQueueables = Limits.getLimitQueueableJobs() - Limits.getQueueableJobs();
-            if (remainingQueueables <= 0) {
-                API_APIResponse_INS.createAPIResponse(null, null, 'Queueable limit reached — skipped work note sync for ' + feedItems.size() + ' FeedItem(s)', false, null, 'ChangeRequestHandler afterUpdate', 'false', '500', 'QueueableLimitExceeded', null, null, null);
-            } else if (feedItems.size() <= remainingQueueables) {
-                for (FeedItem feedItem : feedItems) {
-                    System.enqueueJob(new CreateRequestQueueable(new List<Case>(), new List<Task>(), new List<FeedItem>{feedItem}, false, false, false));
+    public static void syncFeedItemsForCases(Set<Id> caseIds, String logContext) {
+        if (caseIds.isEmpty()) {
+            return;
+        }
+
+        List<FeedItem> feedItems = [
+            SELECT Id, ParentId, Body, Visibility, Type
+            FROM FeedItem
+            WHERE ParentId IN :caseIds
+            AND Visibility = 'AllUsers'
+            AND Type = 'TextPost'
+            LIMIT 1000
+        ];
+
+        if (feedItems.isEmpty()) {
+            return;
+        }
+
+        Integer remainingQueueables = Limits.getLimitQueueableJobs() - Limits.getQueueableJobs();
+        if (remainingQueueables <= 0) {
+            API_APIResponse_INS.createAPIResponse(null, null, 'Queueable limit reached — skipped work note sync for ' + feedItems.size() + ' FeedItem(s)', false, null, logContext, 'false', '500', 'QueueableLimitExceeded', null, null, null);
+        } else if (feedItems.size() <= remainingQueueables) {
+            for (FeedItem feedItem : feedItems) {
+                System.enqueueJob(new CreateRequestQueueable(new List<Case>(), new List<Task>(), new List<FeedItem>{feedItem}, false, false, false));
+            }
+        } else {
+            Integer batchesEnqueued = 0;
+            for (Integer i = 0; i < feedItems.size() && batchesEnqueued < remainingQueueables; i += CityIntegrationConstants.MAX_FEEDITEMS_PER_QUEUEABLE) {
+                Integer endIndex = Math.min(i + CityIntegrationConstants.MAX_FEEDITEMS_PER_QUEUEABLE, feedItems.size());
+                List<FeedItem> batch = new List<FeedItem>();
+                for (Integer j = i; j < endIndex; j++) {
+                    batch.add(feedItems[j]);
                 }
-            } else {
-                Integer batchesEnqueued = 0;
-                for (Integer i = 0; i < feedItems.size() && batchesEnqueued < remainingQueueables; i += CityIntegrationConstants.MAX_FEEDITEMS_PER_QUEUEABLE) {
-                    Integer endIndex = Math.min(i + CityIntegrationConstants.MAX_FEEDITEMS_PER_QUEUEABLE, feedItems.size());
-                    List<FeedItem> batch = new List<FeedItem>();
-                    for (Integer j = i; j < endIndex; j++) {
-                        batch.add(feedItems[j]);
-                    }
-                    System.enqueueJob(new CreateRequestQueueable(new List<Case>(), new List<Task>(), batch, false, false, false));
-                    batchesEnqueued++;
-                }
-                Integer totalBatchesPossible = (Integer) Math.ceil((Decimal) feedItems.size() / CityIntegrationConstants.MAX_FEEDITEMS_PER_QUEUEABLE);
-                if (batchesEnqueued < totalBatchesPossible) {
-                    Integer skippedItems = feedItems.size() - (batchesEnqueued * CityIntegrationConstants.MAX_FEEDITEMS_PER_QUEUEABLE);
-                    API_APIResponse_INS.createAPIResponse(null, null, 'Queueable limit reached — skipped work note sync for ~' + skippedItems + ' FeedItem(s) (' + batchesEnqueued + '/' + totalBatchesPossible + ' batches enqueued)', false, null, 'ChangeRequestHandler afterUpdate', 'false', '500', 'QueueableLimitExceeded', null, null, null);
-                }
+                System.enqueueJob(new CreateRequestQueueable(new List<Case>(), new List<Task>(), batch, false, false, false));
+                batchesEnqueued++;
+            }
+            Integer totalBatchesPossible = (Integer) Math.ceil((Decimal) feedItems.size() / CityIntegrationConstants.MAX_FEEDITEMS_PER_QUEUEABLE);
+            if (batchesEnqueued < totalBatchesPossible) {
+                Integer skippedItems = feedItems.size() - (batchesEnqueued * CityIntegrationConstants.MAX_FEEDITEMS_PER_QUEUEABLE);
+                API_APIResponse_INS.createAPIResponse(null, null, 'Queueable limit reached — skipped work note sync for ~' + skippedItems + ' FeedItem(s) (' + batchesEnqueued + '/' + totalBatchesPossible + ' batches enqueued)', false, null, logContext, 'false', '500', 'QueueableLimitExceeded', null, null, null);
             }
         }
     }
