@@ -1,20 +1,5 @@
-/**
- * @description  Enterprise-standard test class for MPLRequest.
- *               Validates all six inner DTO classes: CreateIncident,
- *               CreateWorkNote, ResolveIncident, ReopenIncident,
- *               CreateChangeRequest, and ChangeRequestTask.
- *               Covers property assignment, null defaults, JSON
- *               deserialization fidelity, and nested collection handling.
- *
- * Observability gap: MPLRequest is a pure DTO wrapper class with no
- * logging, DML, SOQL, or callout behavior — expected by design.
- */
 @isTest
-private class TestMPLRequest {
-
-    // ════════════════════════════════════════════════════════════════════
-    //  A. CreateIncident — property assignment & read
-    // ════════════════════════════════════════════════════════════════════
+private class MPLRequestTest {
 
     @isTest
     static void test_CreateIncident_properties_canBeSetAndRead() {
@@ -42,10 +27,6 @@ private class TestMPLRequest {
             'Subcategory should match the assigned value');
     }
 
-    // ════════════════════════════════════════════════════════════════════
-    //  B. CreateWorkNote — property assignment & read
-    // ════════════════════════════════════════════════════════════════════
-
     @isTest
     static void test_CreateWorkNote_properties_canBeSetAndRead() {
         Test.startTest();
@@ -59,10 +40,6 @@ private class TestMPLRequest {
         System.assertEquals('Technician dispatched to site.', req.Details,
             'Details should match the assigned value');
     }
-
-    // ════════════════════════════════════════════════════════════════════
-    //  C. ResolveIncident — property assignment & read
-    // ════════════════════════════════════════════════════════════════════
 
     @isTest
     static void test_ResolveIncident_properties_canBeSetAndRead() {
@@ -78,10 +55,6 @@ private class TestMPLRequest {
             'CloseDescription should match the assigned value');
     }
 
-    // ════════════════════════════════════════════════════════════════════
-    //  D. ReopenIncident — property assignment & read
-    // ════════════════════════════════════════════════════════════════════
-
     @isTest
     static void test_ReopenIncident_properties_canBeSetAndRead() {
         Test.startTest();
@@ -92,10 +65,6 @@ private class TestMPLRequest {
         System.assertEquals('500000000000003', req.IncidentRecID,
             'IncidentRecID should match the assigned value');
     }
-
-    // ════════════════════════════════════════════════════════════════════
-    //  E. ChangeRequestTask — property assignment & read
-    // ════════════════════════════════════════════════════════════════════
 
     @isTest
     static void test_ChangeRequestTask_properties_canBeSetAndRead() {
@@ -125,10 +94,6 @@ private class TestMPLRequest {
         System.assertEquals('CTASK0012345', task.APITicketID,
             'APITicketID should match the assigned value');
     }
-
-    // ════════════════════════════════════════════════════════════════════
-    //  F. CreateChangeRequest — full property assignment with tasks list
-    // ════════════════════════════════════════════════════════════════════
 
     @isTest
     static void test_CreateChangeRequest_properties_canBeSetAndRead() {
@@ -184,10 +149,6 @@ private class TestMPLRequest {
             'Second task Title should match');
     }
 
-    // ════════════════════════════════════════════════════════════════════
-    //  G. JSON DESERIALIZATION — CreateIncident
-    // ════════════════════════════════════════════════════════════════════
-
     @isTest
     static void test_CreateIncident_jsonDeserialization_succeeds() {
         String jsonPayload = '{'
@@ -217,10 +178,6 @@ private class TestMPLRequest {
         System.assertEquals('Connectivity', req.Subcategory,
             'Deserialized Subcategory should match JSON value');
     }
-
-    // ════════════════════════════════════════════════════════════════════
-    //  H. JSON DESERIALIZATION — CreateChangeRequest with nested tasks
-    // ════════════════════════════════════════════════════════════════════
 
     @isTest
     static void test_CreateChangeRequest_jsonDeserialization_withTasks_succeeds() {
@@ -284,10 +241,6 @@ private class TestMPLRequest {
         System.assertEquals('Implementation', req.tasks[1].Type,
             'Second task Type should match JSON value');
     }
-
-    // ════════════════════════════════════════════════════════════════════
-    //  I. NULL DEFAULTS — all inner classes default to null properties
-    // ════════════════════════════════════════════════════════════════════
 
     @isTest
     static void test_CreateIncident_nullDefaults() {
@@ -393,10 +346,6 @@ private class TestMPLRequest {
             'APITicketID should default to null');
     }
 
-    // ════════════════════════════════════════════════════════════════════
-    //  J. EDGE — CreateChangeRequest with empty tasks list
-    // ════════════════════════════════════════════════════════════════════
-
     @isTest
     static void test_CreateChangeRequest_emptyTasksList() {
         Test.startTest();
@@ -410,13 +359,8 @@ private class TestMPLRequest {
             'tasks list should be empty');
     }
 
-    // ════════════════════════════════════════════════════════════════════
-    //  K. EDGE — JSON deserialization with missing / extra fields
-    // ════════════════════════════════════════════════════════════════════
-
     @isTest
     static void test_CreateIncident_jsonDeserialization_partialPayload() {
-        // Only populate 2 of 6 fields — remaining should be null
         String jsonPayload = '{"Description": "Partial payload", "Priority": "3"}';
 
         Test.startTest();
@@ -440,7 +384,6 @@ private class TestMPLRequest {
 
     @isTest
     static void test_CreateChangeRequest_jsonDeserialization_noTasks() {
-        // Change request JSON without any tasks array
         String jsonPayload = '{"Description": "No tasks", "APIChangeID": "CHG999"}';
 
         Test.startTest();
@@ -456,17 +399,13 @@ private class TestMPLRequest {
             'tasks should be null when omitted from JSON');
     }
 
-    // ════════════════════════════════════════════════════════════════════
-    //  L. OUTER CLASS — instantiation for coverage
-    // ════════════════════════════════════════════════════════════════════
-
     @isTest
     static void test_outerClass_canBeInstantiated() {
         Test.startTest();
-        MPLRequest outer = new MPLRequest();
+        MPLRequest testouter = new MPLRequest();
         Test.stopTest();
 
-        System.assertNotEquals(null, outer,
-            'Outer MPLRequest class should be instantiable');
+        System.assertNotEquals(null, testouter,
+            'testouter MPLRequest class should be instantiable');
     }
 }

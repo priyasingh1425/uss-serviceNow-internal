@@ -1,21 +1,5 @@
-/**
- * @description  Enterprise-standard test class for CityIntegrationConstants.
- *               Validates all dynamic property getters (with and without custom
- *               setting data), priority mapping methods, edge/null/blank inputs,
- *               and constant accessibility.
- *
- * Observability gap: CityIntegrationConstants does not log errors to any
- * persistent object or System.debug — expected by design for a constants class.
- *
- * Deployment risk: The class hardcodes fallback queue/contact names as string
- * literals. If the org renames these values the fallbacks silently diverge.
- */
 @isTest
-private class TestCityIntegrationConstants {
-
-    // ════════════════════════════════════════════════════════════════════
-    //  A. POSITIVE SCENARIOS — Custom Setting populated
-    // ════════════════════════════════════════════════════════════════════
+private class CityIntegrationConstantsTest {
 
     @isTest
     static void test_getAccountId_customSettingPopulated_returnsSettingValue() {
@@ -80,13 +64,8 @@ private class TestCityIntegrationConstants {
             'SUPPORT_QUEUE_TOC should return the value from custom settings when populated');
     }
 
-    // ════════════════════════════════════════════════════════════════════
-    //  B. NEGATIVE SCENARIOS — Custom Setting missing / null fields
-    // ════════════════════════════════════════════════════════════════════
-
     @isTest
     static void test_getAccountId_customSettingMissing_returnsNull() {
-        // No custom setting inserted — getInstance() returns an empty instance
         Test.startTest();
         Id result = CityIntegrationConstants.ACCOUNT_ID;
         Test.stopTest();
@@ -124,10 +103,6 @@ private class TestCityIntegrationConstants {
         System.assertEquals('TOC Support', result,
             'SUPPORT_QUEUE_TOC should fall back to "TOC Support" when custom settings are absent');
     }
-
-    // ════════════════════════════════════════════════════════════════════
-    //  C. getPriorityLabel — valid mappings
-    // ════════════════════════════════════════════════════════════════════
 
     @isTest
     static void test_getPriorityLabel_validNumber1_returnsUrgent() {
@@ -179,10 +154,6 @@ private class TestCityIntegrationConstants {
             'getPriorityLabel should trim whitespace before lookup');
     }
 
-    // ════════════════════════════════════════════════════════════════════
-    //  D. getPriorityLabel — negative & edge cases
-    // ════════════════════════════════════════════════════════════════════
-
     @isTest
     static void test_getPriorityLabel_nullInput_returnsEmptyString() {
         Test.startTest();
@@ -232,10 +203,6 @@ private class TestCityIntegrationConstants {
         System.assertEquals('', result,
             'getPriorityLabel with a non-numeric string should return an empty string');
     }
-
-    // ════════════════════════════════════════════════════════════════════
-    //  E. getPriorityNumber — valid mappings
-    // ════════════════════════════════════════════════════════════════════
 
     @isTest
     static void test_getPriorityNumber_lowercaseLabel_returnsNumber() {
@@ -287,10 +254,6 @@ private class TestCityIntegrationConstants {
             'getPriorityNumber should be case-insensitive');
     }
 
-    // ════════════════════════════════════════════════════════════════════
-    //  F. getPriorityNumber — negative & edge cases
-    // ════════════════════════════════════════════════════════════════════
-
     @isTest
     static void test_getPriorityNumber_nullInput_returnsEmptyString() {
         Test.startTest();
@@ -330,10 +293,6 @@ private class TestCityIntegrationConstants {
         System.assertEquals('', result,
             'getPriorityNumber with unmapped label should return an empty string');
     }
-
-    // ════════════════════════════════════════════════════════════════════
-    //  G. STATIC CONSTANTS & COLLECTIONS — accessibility checks
-    // ════════════════════════════════════════════════════════════════════
 
     @isTest
     static void test_constants_accountStatusActive_isAccessible() {
@@ -438,7 +397,6 @@ private class TestCityIntegrationConstants {
         System.assertEquals(4, labelToNum.size(),
             'PRIORITY_LABEL_TO_NUMBER should contain 4 mappings');
 
-        // Cross-validate the maps are reciprocal
         System.assertEquals('Urgent', numToLabel.get('1'), 'Map should map "1" to "Urgent"');
         System.assertEquals('1', labelToNum.get('urgent'), 'Map should map "urgent" to "1"');
     }

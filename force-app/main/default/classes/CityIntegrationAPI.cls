@@ -12,8 +12,6 @@ global with sharing class CityIntegrationAPI {
             return MPLResponse.error('Missing action parameter');
         }
 
-        System.debug('Request Body: '+ body);
-
         String accId;
         String conId;
         if (action == 'createIncident' || action == 'createChangeRequest') {
@@ -60,8 +58,6 @@ global with sharing class CityIntegrationAPI {
             return MPLResponse.error('Missing action parameter');
         }
         
-        System.debug('Request Body: '+ body);
-
         API_APIResponse_INS.createAPIResponse(req.requestURI, body, 'Unsupported PATCH action: ' + action, false, 'PATCH', 'CityIntegrationAPI handlePatch', 'false', '400', 'Error', null, null, null);
         return MPLResponse.error('Unsupported PATCH action: ' + action);
     }
@@ -176,7 +172,7 @@ global with sharing class CityIntegrationAPI {
             API_APIResponse_INS.createAPIResponse(req.requestURI, body, e.getMessage(), false, 'POST', 'CityIntegrationAPI createWorkNote', 'false', '500', 'Error', null, parentId, null);
             RestContext.response.statusCode = 500;
             return MPLResponse.error('Failed to create work note: ' + e.getMessage());
-        }
+        } 
     }
     
     private static MPLResponse processResolveIncident(RestRequest req, String body, String action) {
@@ -382,7 +378,7 @@ global with sharing class CityIntegrationAPI {
                 caseAlreadyExists = true;
             } else {
                 Case c = new Case();
-                c.Support_Queue__c = 'TOC Support';
+                c.Support_Queue__c = CityIntegrationConstants.SUPPORT_QUEUE_TOC;
                 c.RecordTypeId = recordTypeId;
                 c.Origin = 'API';
                 c.Status = 'New';
@@ -449,7 +445,7 @@ global with sharing class CityIntegrationAPI {
                     }
 
                     Case ct = new Case();
-                    ct.Support_Queue__c = 'TOC Support';
+                    ct.Support_Queue__c = CityIntegrationConstants.SUPPORT_QUEUE_TOC;
                     ct.RecordTypeId = recordTypeId;
                     ct.Subject = taskPayload.Title;
                     ct.Description = taskPayload.Description;
